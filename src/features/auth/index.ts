@@ -1,31 +1,37 @@
-import NextAuth from "next-auth/next";
-import CredentialsProvider from "next-auth/providers/credentials"
+import NextAuth from "next-auth";
+import emailPasswordProvider from "./providers/emailPasswordProvider";
 
-const auth = NextAuth({
+const nextAuth = NextAuth({
+    session: {
+        strategy: "jwt"
+    },
     providers:[
-        CredentialsProvider({
-            name: "Email/Password",
-            credentials: {
-                email: {
-                    label: "Email",
-                    type: "text",
-                },
-                password: {
-                    label: "password",
-                    type: "password"
-                }
-            },
-            authorize: async (credentials, req) => {
-
-                const user = { id: "1", name: "John Doe", email: "john.doe@example.com" };
-
-                if (user){
-                    return user;
-                }
-                return null;
-            },
-        })
-    ]
+        emailPasswordProvider
+    ],
+    callbacks: {
+        session: async({session, user, token}) => {
+            if (session.user){
+                session.user.id = token.userId as string;
+            }
+            return session;
+        },
+        jwt: async ({ token, user, account, profile }) => {
+            if(account && account.type === "credentials") {
+                token.userId = account.providerAccountId; // this is Id that coming from authorize() callback 
+            }
+            return token
+        }
+    },
+    pages: {
+        signIn: "/login"
+    }
 })
 
-export default auth;
+export const {
+    signIn,
+    signOut,
+    handlers: { GET, POST},
+    auth
+} = nextAuth;
+
+export default nextAuth;

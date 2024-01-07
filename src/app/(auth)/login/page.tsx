@@ -1,5 +1,7 @@
 "use client";
 
+import { auth } from "@/features/auth";
+import { signIn } from "next-auth/react";
 import {
 	Paper,
 	PasswordInput,
@@ -13,13 +15,32 @@ import {
 import { useForm } from "@mantine/form";
 import React from "react";
 
+interface LoginFormType {
+	email: string,
+	password: string
+}
+
 export default function LoginPage() {
-	const form = useForm({
+	const form = useForm<LoginFormType>({
 		initialValues: {
 			email: "",
 			password: "",
 		},
 	});
+
+	const handleFormSubmit = async (values: LoginFormType) => {
+		await signIn("credentials", {
+			email: values.email,
+			password: values.password,
+			callbackUrl: "/"
+		})
+	}
+
+	// const session = await auth()
+	// const user = session?.user;
+
+	// console.log("session", session)
+	// console.log("user",user);
 
 	return (
 		<div className="w-screen h-screen flex items-center justify-center">
@@ -27,7 +48,7 @@ export default function LoginPage() {
 				<Text size="lg" fw={500} mb={30}>
 					Welcome
 				</Text>
-				<form>
+				<form onSubmit={form.onSubmit(handleFormSubmit)}>
 					<Stack>
 						<TextInput
 							label="Email"
@@ -53,7 +74,7 @@ export default function LoginPage() {
 							// onClick={() => toggle()}
 							size="xs"
 						>
-							Don't have an account? Register
+							Don&apos;t have an account? Register
 						</Anchor>
 
                         <Button type="submit" radius="xl">
