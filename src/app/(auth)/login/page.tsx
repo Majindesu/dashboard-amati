@@ -1,6 +1,5 @@
 "use client";
 
-import { auth } from "@/features/auth";
 import { signIn } from "next-auth/react";
 import {
 	Paper,
@@ -15,11 +14,20 @@ import {
 import { useForm } from "@mantine/form";
 import React from "react";
 
+/**
+ * Type definition for login form values.
+ */
 interface LoginFormType {
 	email: string,
 	password: string
 }
 
+/**
+ * LoginPage component: Renders a login form allowing users to authenticate using their credentials.
+ * Utilizes Mantine for UI components and Next-Auth for authentication handling.
+ * 
+ * @returns React functional component representing the login page.
+ */
 export default function LoginPage() {
 	const form = useForm<LoginFormType>({
 		initialValues: {
@@ -28,6 +36,11 @@ export default function LoginPage() {
 		},
 	});
 
+	/**
+	 * Handles form submission by calling Next-Auth signIn function with credentials.
+	 * 
+	 * @param values - Object containing email and password entered by the user.
+	 */
 	const handleFormSubmit = async (values: LoginFormType) => {
 		await signIn("credentials", {
 			email: values.email,
@@ -35,12 +48,6 @@ export default function LoginPage() {
 			callbackUrl: "/"
 		})
 	}
-
-	// const session = await auth()
-	// const user = session?.user;
-
-	// console.log("session", session)
-	// console.log("user",user);
 
 	return (
 		<div className="w-screen h-screen flex items-center justify-center">
@@ -68,11 +75,11 @@ export default function LoginPage() {
 
 					<Group justify="space-between" mt="xl">
 						<Anchor
-							component="button"
+							component="a"
 							type="button"
 							c="dimmed"
-							// onClick={() => toggle()}
 							size="xs"
+							href="/register"
 						>
 							Don&apos;t have an account? Register
 						</Anchor>

@@ -1,7 +1,10 @@
 import NextAuth from "next-auth";
 import emailPasswordProvider from "./providers/emailPasswordProvider";
+import prisma from "@/db";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 const nextAuth = NextAuth({
+    adapter: PrismaAdapter(prisma),
     session: {
         strategy: "jwt"
     },
@@ -25,7 +28,7 @@ const nextAuth = NextAuth({
     pages: {
         signIn: "/login"
     }
-})
+});
 
 export const {
     signIn,

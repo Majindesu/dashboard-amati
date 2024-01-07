@@ -1,11 +1,21 @@
 import CredentialsProvider from "next-auth/providers/credentials"
+import { validateUser } from "../authUtils";
+import AuthError, { AuthErrorCode } from "../AuthError";
+import BaseError from "@/BaseError";
 
+/**
+ * Factory function to create a credential provider.
+ * It defines the structure of the credentials and includes an authorization function
+ * to validate the user's credentials.
+ * 
+ * @returns A CredentialsProvider instance configured for email-password authentication.
+ */
 const credential = CredentialsProvider({
     name: "email-password",
     credentials: {
         email: {
             label: "Email",
-            type: "text",
+            type: "email",
         },
         password: {
             label: "password",
@@ -13,22 +23,23 @@ const credential = CredentialsProvider({
         }
     },
     authorize: async (credentials) => {
-        // Ensure credentials are defined and properly structured
-        if (credentials && typeof credentials.email === 'string' && typeof credentials.password === 'string') {
-            // Implement your authentication logic here
-            // For the sake of example, we're using a static user object
-            const user = { id: "1", name: "John Doe", email: "john.doe@example.com" };
-
-            // Add your logic to validate the user here
-            // ...
-
-            if (user){
-                return user;
+        try {
+            // Ensure credentials are properly formatted strings
+            if (typeof credentials.email !== "string" || typeof credentials.password !== "string"){
+                throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 401);
             }
-            console.log("here inside")
+
+            // Validate user with provided credentials
+            const user = await validateUser(credentials.email, credentials.password);
+            return user;
+        } catch (e: unknown){
+            // Handle specific authentication errors, re-throw others
+            if (e instanceof AuthError){
+                // Generalize error message for security
+                throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 401, "Invalid email/password.");
+            }
+            throw e;
         }
-        console.log("here outside")
-        return null;
     },
 })
 

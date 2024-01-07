@@ -5,6 +5,7 @@ import "./globals.css"
 import '@mantine/core/styles.css';
 
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { TrpcProvider } from '@/trpc/TrpcProvider';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,7 +26,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <MantineProvider>
-          {children}
+          <TrpcProvider>
+            {children}
+          </TrpcProvider>
         </MantineProvider>
       </body>
     </html>
