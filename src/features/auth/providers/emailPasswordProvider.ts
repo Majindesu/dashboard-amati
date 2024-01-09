@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials"
-import { validateUser } from "../authUtils";
 import AuthError, { AuthErrorCode } from "../AuthError";
 import BaseError from "@/BaseError";
+import signIn from "../actions/signIn";
 
 /**
  * Factory function to create a credential provider.
@@ -30,13 +30,14 @@ const credential = CredentialsProvider({
             }
 
             // Validate user with provided credentials
-            const user = await validateUser(credentials.email, credentials.password);
+            const user = await signIn(credentials.email, credentials.password);
             return user;
         } catch (e: unknown){
             // Handle specific authentication errors, re-throw others
             if (e instanceof AuthError){
-                // Generalize error message for security
-                throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 401, "Invalid email/password.");
+                // Auth invalid
+                if ([AuthErrorCode.EMAIL_NOT_FOUND, AuthErrorCode.EMPTY_USER_HASH, AuthErrorCode.INVALID_CREDENTIALS].includes(e.errorCode as AuthErrorCode))
+                    return null;
             }
             throw e;
         }

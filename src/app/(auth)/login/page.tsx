@@ -9,23 +9,24 @@ import {
 	TextInput,
 	Group,
 	Anchor,
-    Button,
+	Button,
+	Alert,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import React from "react";
+import React, { useState } from "react";
 
 /**
  * Type definition for login form values.
  */
 interface LoginFormType {
-	email: string,
-	password: string
+	email: string;
+	password: string;
 }
 
 /**
  * LoginPage component: Renders a login form allowing users to authenticate using their credentials.
  * Utilizes Mantine for UI components and Next-Auth for authentication handling.
- * 
+ *
  * @returns React functional component representing the login page.
  */
 export default function LoginPage() {
@@ -36,18 +37,26 @@ export default function LoginPage() {
 		},
 	});
 
+	const [errorMessage, setErrorMessage] = useState("");
+
 	/**
 	 * Handles form submission by calling Next-Auth signIn function with credentials.
-	 * 
+	 *
 	 * @param values - Object containing email and password entered by the user.
 	 */
 	const handleFormSubmit = async (values: LoginFormType) => {
-		await signIn("credentials", {
-			email: values.email,
-			password: values.password,
-			callbackUrl: "/"
-		})
-	}
+		try {
+			await signIn("credentials", {
+				email: values.email,
+				password: values.password,
+				callbackUrl: "/",
+				redirect: false,
+			});
+		} catch (e) {
+			// TODO: Handle proper error message
+			setErrorMessage("Email/Password does not match");
+		}
+	};
 
 	return (
 		<div className="w-screen h-screen flex items-center justify-center">
@@ -57,6 +66,16 @@ export default function LoginPage() {
 				</Text>
 				<form onSubmit={form.onSubmit(handleFormSubmit)}>
 					<Stack>
+						{errorMessage ? (
+							<Alert
+								variant="filled"
+								color="pink"
+								title=""
+								// icon={icon}
+							>
+								{errorMessage}
+							</Alert>
+						) : null}
 						<TextInput
 							label="Email"
 							placeholder="Enter your email"
@@ -84,9 +103,9 @@ export default function LoginPage() {
 							Don&apos;t have an account? Register
 						</Anchor>
 
-                        <Button type="submit" radius="xl">
-                            Login
-                        </Button>
+						<Button type="submit" radius="xl">
+							Login
+						</Button>
 					</Group>
 				</form>
 			</Paper>

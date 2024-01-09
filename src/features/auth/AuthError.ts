@@ -2,8 +2,9 @@ import BaseError from "@/BaseError";
 
 export enum AuthErrorCode {
     EMAIL_NOT_FOUND = "EMAIL_NOT_FOUND",
+    EMPTY_USER_HASH = "EMPTY_USER_HASH",
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
-    EMPTY_USER_HASH = "EMPTY_USER_HASH"
+    USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS"
 }
 
 export default class AuthError extends BaseError {

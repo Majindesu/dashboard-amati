@@ -16,7 +16,7 @@ import { useForm } from "@mantine/form";
 import React, { useEffect } from "react";
 import { api } from "@/trpc/utils";
 
-interface RegisterFormType {
+export interface RegisterFormSchema {
 	email: string,
 	password: string,
     passwordConfirmation: string,
@@ -25,13 +25,7 @@ interface RegisterFormType {
 
 export default function RegisterPage() {
 
-    const {data, isLoading} = api.auth.register.useQuery();
-
-    useEffect(() => {
-        console.log("data", data)
-    }, [data])
-
-	const form = useForm<RegisterFormType>({
+	const form = useForm<RegisterFormSchema>({
 		initialValues: {
 			email: "",
 			password: "",
@@ -41,14 +35,26 @@ export default function RegisterPage() {
         validate: {
             email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
             password: (value: string) => (value.length > 6 ? null : 'Password should be at least 6 characters'),
-            passwordConfirmation: (value: string, values: RegisterFormType) => value === values.password ? null : 'Passwords should match',
+            passwordConfirmation: (value: string, values: RegisterFormSchema) => value === values.password ? null : 'Passwords should match',
             name: (value: string) => (value.length > 0 ? null : 'Name is required'),
         }
 	});
 
-	const handleFormSubmit = async (values: RegisterFormType) => {
+	const registerMutation = api.auth.register.useMutation({
+		onSuccess: async () => {
+			console.log("success. signing in")
+			await signIn("credentials", {
+				email: form.values.email,
+				password: form.values.password,
+				callbackUrl: "/dashboard"
+			})
+			console.log("signed in")
+		}
+	})
+
+	const handleFormSubmit = (values: RegisterFormSchema) => {
 		// await 
-        
+        registerMutation.mutate(values)
 	}
 
 	return (
