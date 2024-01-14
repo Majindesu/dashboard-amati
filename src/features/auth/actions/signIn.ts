@@ -1,70 +1,89 @@
-"use server"
+"use server";
 import prisma from "@/db";
 import { User } from "@prisma/client";
 import AuthError, { AuthErrorCode } from "../AuthError";
 import { comparePassword, createJwtToken } from "../authUtils";
 import { cookies } from "next/headers";
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 /**
- * Validates the user by their email and password.
- * If the user is found and the password is correct, it returns the user.
- * Throws an AuthError if any authentication step fails.
- * 
- * @param email - The email of the user to validate.
- * @param password - The password to validate against the user's stored hash.
- * @returns The authenticated user object.
- * @throws {AuthError} - EMAIL_NOT_FOUND if no user is found, INVALID_CREDENTIALS if the password doesn't match, or other auth-related errors.
+ * Handles the sign-in process for a user.
+ *
+ * This function validates a user's credentials (email and password), checks against the database,
+ * and on successful validation, redirects the user to the dashboard and sets a cookie with a JWT token.
+ * If the validation fails at any stage, it throws a custom AuthError.
+ *
+ * @param prevState - The previous state of the application, not currently used.
+ * @param rawFormData - The raw form data containing the user's email and password.
+ * @returns A promise that resolves to a redirect to the dashboard on successful authentication,
+ *          or an object containing error details on failure.
+ * @throws {AuthError} - Specific authentication error based on the failure stage.
  */
 export default async function signIn(prevState: any, rawFormData: FormData) {
-    //TODO: Add Throttling
-    try {
-        const formData = {
-            email: rawFormData.get("email") as string,
-            password: rawFormData.get("password") as string
-        }
+	//TODO: Add Throttling
+	//TODO: Add validation check if the user is already logged in
+	try {
+		const formData = {
+			email: rawFormData.get("email") as string,
+			password: rawFormData.get("password") as string,
+		};
 
-        // Retrieve user from the database by email
-        const user = await prisma.user.findUnique({
-            where: { email: formData.email }
-        });
+		// Retrieve user from the database by email
+		const user = await prisma.user.findUnique({
+			where: { email: formData.email },
+		});
 
-        // Throw if user not found
-        if (!user) throw new AuthError(AuthErrorCode.EMAIL_NOT_FOUND, 401);
+		// Throw if user not found
+		if (!user) throw new AuthError(AuthErrorCode.EMAIL_NOT_FOUND);
 
-        // Throw if user has no password hash
-        // TODO: Add check if the user uses another provider
-        if (!user.passwordHash) throw new AuthError(AuthErrorCode.EMPTY_USER_HASH, 500);
-        
-        // Compare the provided password with the user's stored password hash
-        const isMatch = await comparePassword(formData.password, user.passwordHash);
-        if (!isMatch) throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 401);
+		// Throw if user has no password hash
+		// TODO: Add check if the user uses another provider
+		if (!user.passwordHash)
+			throw new AuthError(AuthErrorCode.EMPTY_USER_HASH);
 
-        //Set cookie
-        //TODO: Auth: Add expiry
-        const token = createJwtToken({id: user.id});
+		// Compare the provided password with the user's stored password hash
+		const isMatch = await comparePassword(
+			formData.password,
+			user.passwordHash
+		);
+		if (!isMatch) throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS);
 
-        cookies().set("token",token);
+		//Set cookie
+		//TODO: Auth: Add expiry
+		const token = createJwtToken({ id: user.id });
 
-        redirect("/dashboard");
+		cookies().set("token", token);
 
-    } catch (e: unknown){
-        if (e instanceof AuthError){
-            if ([
-                AuthErrorCode.EMAIL_NOT_FOUND, AuthErrorCode.INVALID_CREDENTIALS
-            ]) {
-                return {
-                    errors: {
-                        message: "Email/Password combination is not match. Please try again"
-                    }
-                }
-            }
-        }
+		redirect("/dashboard");
+	} catch (e: unknown) {
+		// Custom error handling for authentication errors
+		if (e instanceof AuthError) {
+			// Specific error handling for known authentication errors
+			switch (e.errorCode) {
+				case AuthErrorCode.EMAIL_NOT_FOUND:
+				case AuthErrorCode.INVALID_CREDENTIALS:
+					return {
+						errors: {
+							message:
+								"Email/Password combination is incorrect. Please try again.",
+						},
+					};
+				default:
+					// Handle other types of authentication errors
+					return {
+						errors: {
+							message: e.message,
+						},
+					};
+			}
+		}
 
-        return {
-            errors: {
-                message: "There's something wrong happened on the server. Please try again or contact administrator"
-            }
-        }
-    }
+		// Generic error handling for unexpected server errors
+		return {
+			errors: {
+				message:
+					"An unexpected error occurred on the server. Please try again or contact the administrator.",
+			},
+		};
+	}
 }
