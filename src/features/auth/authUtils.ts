@@ -3,6 +3,8 @@ import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import AuthError, { AuthErrorCode } from "./AuthError";
 import authConfig from "@/config/auth";
+import jwt from "jsonwebtoken"
+import UserClaims from "./types/UserClaims";
 
 /**
  * Hashes a plain text password using bcrypt.
@@ -23,4 +25,11 @@ export async function hashPassword(password: string): Promise<string> {
  */
 export async function comparePassword(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
+}
+
+export function createJwtToken(userclaims: UserClaims, options?: jwt.SignOptions){
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new AuthError(AuthErrorCode.JWT_SECRET_EMPTY); 
+    const token = jwt.sign(userclaims, secret, options);
+    return token;
 }

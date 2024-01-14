@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import signIn from "@/features/auth/actions/signIn";
 import {
 	Paper,
 	PasswordInput,
@@ -12,51 +12,17 @@ import {
 	Button,
 	Alert,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import React, { useState } from "react";
+import React from "react";
+import { useFormState } from "react-dom";
 
-/**
- * Type definition for login form values.
- */
-interface LoginFormType {
-	email: string;
-	password: string;
-}
+const initialState = {
+	errors: {
+		message: "",
+	},
+};
 
-/**
- * LoginPage component: Renders a login form allowing users to authenticate using their credentials.
- * Utilizes Mantine for UI components and Next-Auth for authentication handling.
- *
- * @returns React functional component representing the login page.
- */
 export default function LoginPage() {
-	const form = useForm<LoginFormType>({
-		initialValues: {
-			email: "",
-			password: "",
-		},
-	});
-
-	const [errorMessage, setErrorMessage] = useState("");
-
-	/**
-	 * Handles form submission by calling Next-Auth signIn function with credentials.
-	 *
-	 * @param values - Object containing email and password entered by the user.
-	 */
-	const handleFormSubmit = async (values: LoginFormType) => {
-		try {
-			await signIn("credentials", {
-				email: values.email,
-				password: values.password,
-				callbackUrl: "/",
-				redirect: false,
-			});
-		} catch (e) {
-			// TODO: Handle proper error message
-			setErrorMessage("Email/Password does not match");
-		}
-	};
+	const [state, formAction] = useFormState(signIn, initialState);
 
 	return (
 		<div className="w-screen h-screen flex items-center justify-center">
@@ -64,16 +30,16 @@ export default function LoginPage() {
 				<Text size="lg" fw={500} mb={30}>
 					Welcome
 				</Text>
-				<form onSubmit={form.onSubmit(handleFormSubmit)}>
+				<form action={formAction}>
 					<Stack>
-						{errorMessage ? (
+						{state.errors.message ? (
 							<Alert
 								variant="filled"
 								color="pink"
 								title=""
 								// icon={icon}
 							>
-								{errorMessage}
+								{state.errors.message}
 							</Alert>
 						) : null}
 						<TextInput
@@ -81,14 +47,12 @@ export default function LoginPage() {
 							placeholder="Enter your email"
 							name="email"
 							autoComplete="email"
-							{...form.getInputProps("email")}
 						/>
 						<PasswordInput
 							label="Password"
 							placeholder="Your password"
 							name="password"
 							autoComplete="password"
-							{...form.getInputProps("password")}
 						/>
 					</Stack>
 

@@ -1,7 +1,5 @@
 "use client";
 
-import { auth } from "@/features/auth";
-import { signIn } from "next-auth/react";
 import {
 	Paper,
 	PasswordInput,
@@ -14,7 +12,6 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useEffect } from "react";
-import { api } from "@/trpc/utils";
 
 export interface RegisterFormSchema {
 	email: string,
@@ -40,30 +37,13 @@ export default function RegisterPage() {
         }
 	});
 
-	const registerMutation = api.auth.register.useMutation({
-		onSuccess: async () => {
-			console.log("success. signing in")
-			await signIn("credentials", {
-				email: form.values.email,
-				password: form.values.password,
-				callbackUrl: "/dashboard"
-			})
-			console.log("signed in")
-		}
-	})
-
-	const handleFormSubmit = (values: RegisterFormSchema) => {
-		// await 
-        registerMutation.mutate(values)
-	}
-
 	return (
 		<div className="w-screen h-screen flex items-center justify-center">
 			<Paper radius="md" p="xl" withBorder w={400}>
 				<Text size="lg" fw={500} mb={30}>
 					Register
 				</Text>
-				<form onSubmit={form.onSubmit(handleFormSubmit)}>
+				<form onSubmit={form.onSubmit(() => {})}>
 					<Stack>
                         <TextInput
 							label="Name"

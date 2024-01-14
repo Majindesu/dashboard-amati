@@ -1,7 +1,10 @@
+"use server"
 import prisma from "@/db";
 import { User } from "@prisma/client";
 import AuthError, { AuthErrorCode } from "../AuthError";
-import { comparePassword } from "../authUtils";
+import { comparePassword, createJwtToken } from "../authUtils";
+import { cookies } from "next/headers";
+import { redirect } from 'next/navigation';
 
 /**
  * Validates the user by their email and password.
@@ -13,22 +16,55 @@ import { comparePassword } from "../authUtils";
  * @returns The authenticated user object.
  * @throws {AuthError} - EMAIL_NOT_FOUND if no user is found, INVALID_CREDENTIALS if the password doesn't match, or other auth-related errors.
  */
-export default async function signIn(email: string, password: string): Promise<User> {
-    // Retrieve user from the database by email
-    const user = await prisma.user.findUnique({
-        where: { email }
-    });
+export default async function signIn(prevState: any, rawFormData: FormData) {
+    //TODO: Add Throttling
+    try {
+        const formData = {
+            email: rawFormData.get("email") as string,
+            password: rawFormData.get("password") as string
+        }
 
-    // Throw if user not found
-    if (!user) throw new AuthError(AuthErrorCode.EMAIL_NOT_FOUND, 401);
+        // Retrieve user from the database by email
+        const user = await prisma.user.findUnique({
+            where: { email: formData.email }
+        });
 
-    // Throw if user has no password hash
-    // TODO: Add check if the user uses another provider
-    if (!user.passwordHash) throw new AuthError(AuthErrorCode.EMPTY_USER_HASH, 500);
-    
-    // Compare the provided password with the user's stored password hash
-    const isMatch = await comparePassword(password, user.passwordHash);
-    if (!isMatch) throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 401);
+        // Throw if user not found
+        if (!user) throw new AuthError(AuthErrorCode.EMAIL_NOT_FOUND, 401);
 
-    return user;
+        // Throw if user has no password hash
+        // TODO: Add check if the user uses another provider
+        if (!user.passwordHash) throw new AuthError(AuthErrorCode.EMPTY_USER_HASH, 500);
+        
+        // Compare the provided password with the user's stored password hash
+        const isMatch = await comparePassword(formData.password, user.passwordHash);
+        if (!isMatch) throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 401);
+
+        //Set cookie
+        //TODO: Auth: Add expiry
+        const token = createJwtToken({id: user.id});
+
+        cookies().set("token",token);
+
+        redirect("/dashboard");
+
+    } catch (e: unknown){
+        if (e instanceof AuthError){
+            if ([
+                AuthErrorCode.EMAIL_NOT_FOUND, AuthErrorCode.INVALID_CREDENTIALS
+            ]) {
+                return {
+                    errors: {
+                        message: "Email/Password combination is not match. Please try again"
+                    }
+                }
+            }
+        }
+
+        return {
+            errors: {
+                message: "There's something wrong happened on the server. Please try again or contact administrator"
+            }
+        }
+    }
 }
