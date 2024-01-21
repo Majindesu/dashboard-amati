@@ -1,16 +1,25 @@
 "use client";
 import React from "react";
-import { AppShell, AppShellHeader, Burger } from "@mantine/core";
+import { AppShell } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+
 import AppHeader from "../AppHeader";
 import AppNavbar from "../AppNavbar";
-
-import { useDisclosure } from "@mantine/hooks";
 
 interface Props {
 	children: React.ReactNode;
 }
 
+/**
+ * `DashboardLayout` is a React functional component that provides a layout structure
+ * for the dashboard, including a header, navigation bar, and main content area.
+ *
+ * @param props - The component props.
+ * @param props.children - The child components to be rendered inside the layout.
+ * @returns A React element representing the dashboard layout.
+ */
 export default function DashboardLayout(props: Props) {
+	// State and toggle function for handling the disclosure of the navigation bar
 	const [openNavbar, { toggle }] = useDisclosure(false);
 
 	return (
@@ -29,7 +38,9 @@ export default function DashboardLayout(props: Props) {
 			{/* Navbar */}
 			<AppNavbar />
 
-			<AppShell.Main>{props.children}</AppShell.Main>
+			<AppShell.Main className="bg-slate-100">
+				{props.children}
+			</AppShell.Main>
 		</AppShell>
 	);
 }

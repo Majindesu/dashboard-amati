@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
 	Box,
 	Collapse,
@@ -7,16 +8,24 @@ import {
 	UnstyledButton,
 	rem,
 } from "@mantine/core";
-import { MenuItem } from "../_data/allMenu";
 import { TbChevronRight } from "react-icons/tb";
 
+import { MenuItem } from "../../_data/allMenu";
+import ChildMenu from "../ChildMenu/ChildMenu";
 import classNames from "./menuItem.module.css";
-import ChildMenu from "./ChildMenu";
 
 interface Props {
 	menu: MenuItem;
 }
 
+/**
+ * `MenuItem` is a React functional component that displays an individual menu item.
+ * It can optionally include a collapsible sub-menu for items with children.
+ *
+ * @param props - The component props.
+ * @param props.menu - The menu item data to display.
+ * @returns A React element representing an individual menu item.
+ */
 export default function MenuItem({ menu }: Props) {
 	const hasChildren = Array.isArray(menu.children);
 
@@ -26,46 +35,50 @@ export default function MenuItem({ menu }: Props) {
 		setOpened((prev) => !prev);
 	};
 
-	const subItems = (hasChildren ? menu.children! : []).map((child, i) => (
-		<ChildMenu key={i} item={child} />
+	// Mapping children menu items if available
+	const subItems = (hasChildren ? menu.children! : []).map((child, index) => (
+		<ChildMenu key={index} item={child} />
 	));
 
 	return (
 		<>
-			{/* Main Section */}
+			{/* Main Menu Item */}
 			<UnstyledButton
 				onClick={toggleOpenMenu}
 				className={classNames.control}
 			>
 				<Group justify="space-between" gap={0}>
-					{/* Left Section */}
+					
+					{/* Icon and Label */}
 					<Box style={{ display: "flex", alignItems: "center" }}>
-						{/* Icon */}
 						<ThemeIcon variant="light" size={30} color={menu.color}>
 							<menu.icon
 								style={{ width: rem(18), height: rem(18) }}
 							/>
 						</ThemeIcon>
 
-						{/* Label */}
 						<Box ml="md">{menu.label}</Box>
 					</Box>
 
-					{/* Right Section (Chevron if available) */}
+					{/* Chevron Icon for collapsible items */}
 					{hasChildren && (
 						<TbChevronRight
-							// stroke="1.5"
+							strokeWidth={1.5}
 							style={{
 								width: rem(16),
 								height: rem(16),
-								transform: opened ? "rotate(-90deg)" : "rotate(90deg)",
+								transform: opened
+									? "rotate(-90deg)"
+									: "rotate(90deg)",
 							}}
-                            className={classNames.chevron}
+							className={classNames.chevron}
 						/>
 					)}
 				</Group>
 			</UnstyledButton>
-			{hasChildren ? <Collapse in={opened}>{subItems}</Collapse> : null}
+
+			{/* Collapsible Sub-Menu */}
+			{hasChildren && <Collapse in={opened}>{subItems}</Collapse>}
 		</>
 	);
 }
