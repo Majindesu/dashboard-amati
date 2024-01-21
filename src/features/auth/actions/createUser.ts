@@ -87,9 +87,11 @@ export default async function createUser(formData: FormData){
 
         const token = createJwtToken({ id: user.id });
         cookies().set("token", token);
-        redirect("/dashboard");
     } catch (e: unknown) {    
         // Handle unexpected errors
+        console.error(e)
+        //@ts-ignore
+        console.log(e.message)
         return {
             success: false,
             error: {
@@ -97,4 +99,6 @@ export default async function createUser(formData: FormData){
             },
         };
     }
+
+    redirect("/dashboard");
 }

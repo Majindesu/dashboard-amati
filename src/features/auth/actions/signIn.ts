@@ -54,8 +54,6 @@ export default async function signIn(prevState: any, rawFormData: FormData) {
 		const token = createJwtToken({ id: user.id });
 
 		cookies().set("token", token);
-
-		redirect("/dashboard");
 	} catch (e: unknown) {
 		// Custom error handling for authentication errors
 		if (e instanceof BaseError) {
@@ -87,4 +85,6 @@ export default async function signIn(prevState: any, rawFormData: FormData) {
 			},
 		};
 	}
+
+	redirect("/dashboard");
 }
