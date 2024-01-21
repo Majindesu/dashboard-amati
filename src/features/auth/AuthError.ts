@@ -9,7 +9,7 @@ export enum AuthErrorCode {
 }
 
 export default class AuthError extends BaseError {
-    constructor(errorCode: AuthErrorCode, statusCode = 500, message: string = "Authentication error") {
-        super(message, errorCode, statusCode);
+    constructor(errorCode: AuthErrorCode, {statusCode = 500, message, data}: Partial<{statusCode: number, message: string, data: object}> = {}) {
+        super(message, errorCode, statusCode, data);
     }
 }

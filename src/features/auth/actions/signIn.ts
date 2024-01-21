@@ -5,6 +5,7 @@ import AuthError, { AuthErrorCode } from "../AuthError";
 import { comparePassword, createJwtToken } from "../authUtils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import BaseError from "@/BaseError";
 
 /**
  * Handles the sign-in process for a user.
@@ -57,7 +58,7 @@ export default async function signIn(prevState: any, rawFormData: FormData) {
 		redirect("/dashboard");
 	} catch (e: unknown) {
 		// Custom error handling for authentication errors
-		if (e instanceof AuthError) {
+		if (e instanceof BaseError) {
 			// Specific error handling for known authentication errors
 			switch (e.errorCode) {
 				case AuthErrorCode.EMAIL_NOT_FOUND:
