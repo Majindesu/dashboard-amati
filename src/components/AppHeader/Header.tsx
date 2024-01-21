@@ -1,28 +1,90 @@
-"use client"
-import React from 'react'
-import { AppShell, Burger, Group } from "@mantine/core"
-import { useDisclosure } from '@mantine/hooks'
-import Image from 'next/image'
-import logo from "@/assets/logos/logo-dsg.png"
+import React, { useState } from "react";
+import {
+	AppShell,
+	Avatar,
+	Burger,
+	Group,
+	Menu,
+	UnstyledButton,
+	Text,
+	rem,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import Image from "next/image";
+import logo from "@/assets/logos/logo-dsg.png";
+import cx from "clsx";
+import classNames from "./styles.module.css";
+import { TbChevronDown, TbLogout, TbSettings } from "react-icons/tb";
+import userMenuItems from "./_data/UserMenuItems";
+import UserMenuItem from "./_components/UserMenuItem/UserMenuItem";
 
 interface Props {
-    openNavbar: boolean,
-    toggle: () => void
+	openNavbar: boolean;
+	toggle: () => void;
 }
 
-export default function AppHeader(props: Props) {
+const mockUserData = {
+	name: "Fulan bin Fulanah",
+	email: "janspoon@fighter.dev",
+	image: "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png",
+};
 
-    return (
-        <AppShell.Header>
-            <Group h="100%" px="md">
-                <Burger
-                    opened={props.openNavbar}
-                    onClick={props.toggle}
-                    hiddenFrom="sm"
-                    size="sm"
-                />
-                <Image src={logo} alt='' height={57} />
-            </Group>
-        </AppShell.Header>
-    )
+export default function AppHeader(props: Props) {
+	const [userMenuOpened, setUserMenuOpened] = useState(false);
+
+	const userMenus = userMenuItems.map((item, i) => (
+		<UserMenuItem item={item} key={i} />
+	));
+
+	return (
+		<AppShell.Header>
+			<Group h="100%" px="md" justify="space-between">
+				<Burger
+					opened={props.openNavbar}
+					onClick={props.toggle}
+					hiddenFrom="sm"
+					size="sm"
+				/>
+				<Image src={logo} alt="" height={57} />
+				<Menu
+					width={260}
+					position="bottom-end"
+					transitionProps={{ transition: "pop-top-right" }}
+					onOpen={() => setUserMenuOpened(true)}
+					onClose={() => setUserMenuOpened(false)}
+					withinPortal
+				>
+					<Menu.Target>
+						<UnstyledButton
+							className={cx(classNames.user, {
+								[classNames.userActive]: userMenuOpened,
+							})}
+						>
+							<Group gap={7}>
+								<Avatar
+									src={mockUserData.image}
+									alt={mockUserData.name}
+									radius="xl"
+									size={20}
+								/>
+								<Text fw={500} size="sm" lh={1} mr={3}>
+									{mockUserData.name}
+								</Text>
+								<TbChevronDown
+									style={{ width: rem(12), height: rem(12) }}
+									strokeWidth={1.5}
+								/>
+							</Group>
+						</UnstyledButton>
+					</Menu.Target>
+
+					<Menu.Dropdown>
+						<Menu.Label>Settings</Menu.Label>
+
+						{userMenus}
+					</Menu.Dropdown>
+				</Menu>
+			</Group>
+		</AppShell.Header>
+	);
 }
