@@ -37,7 +37,7 @@ export default function LoginPage() {
 								variant="filled"
 								color="pink"
 								title=""
-								// icon={icon}
+							// icon={icon}
 							>
 								{state.errors.message}
 							</Alert>
