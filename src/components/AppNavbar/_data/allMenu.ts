@@ -28,7 +28,7 @@ const allMenu: MenuItem[] = [
 		icon: TbUsers,
 		color: "grape",
 		children: [
-			{ label: "Users", link: "#" },
+			{ label: "Users", link: "/users" },
 			{ label: "Roles", link: "#" },
 			{ label: "Permissions", link: "#" },
 		],

@@ -6,6 +6,7 @@ import "@mantine/core/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { AuthContextProvider } from "@/features/auth/contexts/AuthContext";
+import { Notifications } from "@mantine/notifications";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
 			</head>
 			<body className={inter.className}>
 				<MantineProvider>
+					<Notifications />
 					<AuthContextProvider>{children}</AuthContextProvider>
 				</MantineProvider>
 			</body>

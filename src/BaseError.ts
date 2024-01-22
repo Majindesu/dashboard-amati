@@ -1,5 +1,6 @@
 export enum BaseErrorCodes {
-    INVALID_FORM_DATA = "INVALID_FORM_DATA"
+    INVALID_FORM_DATA = "INVALID_FORM_DATA",
+    UNAUTHORIZED = "UNAUTHORIZED",
 }
 
 export default class BaseError extends Error {
@@ -14,4 +15,18 @@ export default class BaseError extends Error {
         this.data = data;
         Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
     }
+
+    getErrorReponseObject(){
+        return {
+            success: false,
+            error: {
+                message: this.message,
+                errorCode: this.errorCode,
+            }
+        } as const
+    }
+}
+
+export const unauthorized = () => {
+    throw new BaseError("Unauthorized", BaseErrorCodes.UNAUTHORIZED)
 }

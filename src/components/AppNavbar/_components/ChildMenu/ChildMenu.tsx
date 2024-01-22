@@ -18,12 +18,14 @@ interface Props {
  * @returns A React element representing a child menu item.
  */
 export default function ChildMenu(props: Props) {
+
+	const linkPath = props.item.link.startsWith('/') ? props.item.link : `/${props.item.link}`;
+
 	return (
 		<Text<"a">
 			component="a"
 			className={classNames.link}
-			href={props.item.link}
-            onClick={(e) => e.preventDefault()}
+			href={`/dashboard${linkPath}`}
 		>
             {props.item.label}
         </Text>
