@@ -15,7 +15,7 @@ import logo from "@/assets/logos/logo-dsg.png";
 import cx from "clsx";
 import classNames from "./styles.module.css";
 import { TbChevronDown, TbLogout, TbSettings } from "react-icons/tb";
-import userMenuItems from "./_data/UserMenuItems";
+import userMenuItems from "./_data/userMenuItems";
 import UserMenuItem from "./_components/UserMenuItem/UserMenuItem";
 
 interface Props {

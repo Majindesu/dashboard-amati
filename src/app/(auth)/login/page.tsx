@@ -1,5 +1,6 @@
 "use client";
 
+import getUser from "@/features/auth/actions/getUser";
 import signIn from "@/features/auth/actions/signIn";
 import {
 	Paper,
@@ -12,7 +13,9 @@ import {
 	Button,
 	Alert,
 } from "@mantine/core";
-import React from "react";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
 const initialState = {

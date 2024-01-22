@@ -13,9 +13,9 @@ interface Props {
     children: React.ReactNode
 }
 
-export default function Layout(props: Props) {
+export default async function Layout(props: Props) {
 
-    const user = getUser()
+    const user = await getUser()
 
     if (!user){
         redirect("/login")

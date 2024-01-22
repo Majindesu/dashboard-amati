@@ -5,7 +5,8 @@ import { TbLogout, TbSettings } from "react-icons/tb"
 export interface UserMenuItem {
     label: string,
     icon: React.FC<any>,
-    color?: ThemeIconProps['color']
+    color?: ThemeIconProps['color'],
+    href?: string,
 }
 
 const userMenuItems: UserMenuItem[] = [
@@ -16,7 +17,8 @@ const userMenuItems: UserMenuItem[] = [
     {
         label: "Logout",
         icon: TbLogout,
-        color: "red"
+        color: "red",
+        href: "/logout"
     }
 ];
 
