@@ -7,7 +7,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import columns, { UserRow } from "./columns";
-import { Table, TableThead } from "@mantine/core";
+import { Table, TableThead, Text } from "@mantine/core";
 import { showErrorNotification } from "@/utils/notifications";
 
 interface Props {
@@ -20,16 +20,19 @@ export default function UsersTable({users}: Props) {
 		data: users,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		defaultColumn: {
+			cell: (props) => <Text>{props.getValue() as React.ReactNode}</Text>
+		}
 	});
 
 	return (
-		<Table>
+		<Table verticalSpacing="sm" horizontalSpacing="xs">
 			{/* Thead */}
 			<Table.Thead>
 				{table.getHeaderGroups().map((headerGroup) => (
 					<Table.Tr key={headerGroup.id}>
 						{headerGroup.headers.map((header) => (
-							<Table.Th key={header.id}>
+							<Table.Th key={header.id} style={{maxWidth: `${header.column.columnDef.maxSize}px`, width: `${header.getSize()}`}}>
 								{header.isPlaceholder
 									? null
 									: flexRender(
@@ -47,12 +50,12 @@ export default function UsersTable({users}: Props) {
 				{table.getRowModel().rows.map((row) => (
 					<Table.Tr key={row.id}>
 						{row.getVisibleCells().map((cell) => (
-							<td key={cell.id}>
+							<Table.Td key={cell.id} style={{maxWidth: `${cell.column.columnDef.maxSize}px`}}>
 								{flexRender(
 									cell.column.columnDef.cell,
-									cell.getContext()
+									cell.getContext(),
 								)}
-							</td>
+							</Table.Td>
 						))}
 					</Table.Tr>
 				))}
