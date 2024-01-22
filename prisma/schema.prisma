@@ -42,10 +42,17 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  image         String?
   passwordHash  String?
   accounts      Account[]
   sessions      Session[]
+  photoProfile  UserPhotoProfiles?
+}
+
+model UserPhotoProfiles {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  path          String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

@@ -1,10 +1,11 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import AppHeader from "../AppHeader";
 import AppNavbar from "../AppNavbar";
+import { useAuth } from "@/features/auth/contexts/AuthContext";
 
 interface Props {
 	children: React.ReactNode;
@@ -21,6 +22,12 @@ interface Props {
 export default function DashboardLayout(props: Props) {
 	// State and toggle function for handling the disclosure of the navigation bar
 	const [openNavbar, { toggle }] = useDisclosure(false);
+
+	const {fetchUserData} = useAuth();
+
+	useEffect(() => {
+		fetchUserData()
+	}, [fetchUserData])
 
 	return (
 		<AppShell

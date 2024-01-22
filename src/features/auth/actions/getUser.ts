@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers"
 import "server-only"
-import { decodeJwtToken } from "../authUtils";
+import { decodeJwtToken, getUserFromToken } from "../authUtils";
 import prisma from "@/db";
 import AuthError, { AuthErrorCode } from "../AuthError";
 import logout from "./logout";
@@ -13,16 +13,15 @@ export default async function getUser(){
 
         if (!token) return null;
 
-        const decodedToken = decodeJwtToken(token.value) as {id: string, iat: number};
-        console.log('token', decodedToken)
+        const user = await getUserFromToken(token.value);
 
-        const user = await prisma.user.findFirst({
-            where: {
-                id: decodedToken.id
-            }
-        });
+        if (!user) return null;
 
-        return user;
+        return {
+            name: user.name ?? "",
+            email: user.email ?? "",
+            photoUrl: user.photoProfile?.path ?? null
+        }
     } catch (e: unknown){
         if (e instanceof AuthError && e.errorCode === AuthErrorCode.INVALID_JWT_TOKEN){
             return null;

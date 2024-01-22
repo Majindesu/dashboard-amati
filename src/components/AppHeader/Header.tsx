@@ -17,20 +17,23 @@ import classNames from "./styles.module.css";
 import { TbChevronDown, TbLogout, TbSettings } from "react-icons/tb";
 import userMenuItems from "./_data/userMenuItems";
 import UserMenuItem from "./_components/UserMenuItem/UserMenuItem";
+import { useAuth } from "@/features/auth/contexts/AuthContext";
 
 interface Props {
 	openNavbar: boolean;
 	toggle: () => void;
 }
 
-const mockUserData = {
-	name: "Fulan bin Fulanah",
-	email: "janspoon@fighter.dev",
-	image: "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png",
-};
+// const mockUserData = {
+// 	name: "Fulan bin Fulanah",
+// 	email: "janspoon@fighter.dev",
+// 	image: "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png",
+// };
 
 export default function AppHeader(props: Props) {
 	const [userMenuOpened, setUserMenuOpened] = useState(false);
+
+	const { user } = useAuth()
 
 	const userMenus = userMenuItems.map((item, i) => (
 		<UserMenuItem item={item} key={i} />
@@ -62,13 +65,13 @@ export default function AppHeader(props: Props) {
 						>
 							<Group gap={7}>
 								<Avatar
-									src={mockUserData.image}
-									alt={mockUserData.name}
+									src={user?.photoUrl}
+									alt={user?.name}
 									radius="xl"
 									size={20}
 								/>
 								<Text fw={500} size="sm" lh={1} mr={3}>
-									{mockUserData.name}
+									{user?.name}
 								</Text>
 								<TbChevronDown
 									style={{ width: rem(12), height: rem(12) }}

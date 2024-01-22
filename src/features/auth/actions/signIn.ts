@@ -6,6 +6,7 @@ import { comparePassword, createJwtToken } from "../authUtils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import BaseError from "@/BaseError";
+import { revalidatePath } from "next/cache";
 
 /**
  * Handles the sign-in process for a user.
