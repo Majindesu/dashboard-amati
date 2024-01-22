@@ -1,9 +1,9 @@
-import prisma from "@/db";
+import bcrypt from "bcrypt";
+import jwt, { SignOptions, JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
-import * as bcrypt from "bcrypt";
+import prisma from "@/db";
 import AuthError, { AuthErrorCode } from "./AuthError";
 import authConfig from "@/config/auth";
-import jwt from "jsonwebtoken"
 import UserClaims from "./types/UserClaims";
 
 /**
@@ -27,9 +27,32 @@ export async function comparePassword(password: string, hash: string): Promise<b
     return bcrypt.compare(password, hash);
 }
 
-export function createJwtToken(userclaims: UserClaims, options?: jwt.SignOptions){
+/**
+ * Creates a JWT token based on user claims.
+ * 
+ * @param userClaims - The user claims to encode in the JWT.
+ * @param options - Optional signing options.
+ * @returns The generated JWT token.
+ */
+export function createJwtToken(userClaims: UserClaims, options?: SignOptions): string {
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new AuthError(AuthErrorCode.JWT_SECRET_EMPTY); 
-    const token = jwt.sign(userclaims, secret, options);
-    return token;
+    return jwt.sign(userClaims, secret, options);
+}
+
+/**
+ * Decodes a JWT token and retrieves the payload.
+ * 
+ * @param token - The JWT token to decode.
+ * @returns The decoded payload.
+ */
+export function decodeJwtToken(token: string): JwtPayload | string {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new AuthError(AuthErrorCode.JWT_SECRET_EMPTY);
+
+    try {
+        return jwt.verify(token, secret) as JwtPayload;
+    } catch (error) {
+        throw new AuthError(AuthErrorCode.INVALID_JWT_TOKEN);
+    }
 }

@@ -6,12 +6,20 @@ import logo from "@/assets/logos/logo.png"
 import AppHeader from '../../components/AppHeader'
 import AppNavbar from '../../components/AppNavbar'
 import DashboardLayout from '@/components/DashboardLayout'
+import getUser from '@/features/auth/actions/getUser'
+import { redirect } from 'next/navigation'
 
 interface Props {
     children: React.ReactNode
 }
 
 export default function Layout(props: Props) {
+
+    const user = getUser()
+
+    if (!user){
+        redirect("/login")
+    }
 
     return (
         <DashboardLayout>
