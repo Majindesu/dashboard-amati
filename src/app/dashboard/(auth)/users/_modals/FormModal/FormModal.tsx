@@ -70,7 +70,7 @@ export default function FormModal(props: Props) {
 						form.setErrors(response.errors);
 						return;
 					}
-					showNotification(response.message);
+					showNotification(response.message, "error");
 					return;
 				}
 			})

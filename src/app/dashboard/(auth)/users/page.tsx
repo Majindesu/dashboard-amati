@@ -39,7 +39,8 @@ export default async function UsersPage({searchParams}: Props) {
 		}
 
 		if (searchParams.delete){
-			return <DeleteModal />
+			const userDetail = await getUserDetailById(searchParams.delete)
+			return <DeleteModal data={userDetail} />
 		}
 
 		return null;
