@@ -24,14 +24,14 @@ const columns = [
     columnHelper.accessor('name', {
         header:  "Name",
         cell: (props) => <Group>
-            <Avatar color={stringToColorHex(props.row.original.id)} src={props.row.original.photoUrl}>{props.getValue()?.[0].toUpperCase()}</Avatar>
-            <Text>{props.getValue()}</Text>
+            <Avatar color={stringToColorHex(props.row.original.id)} src={props.row.original.photoUrl} size={26}>{props.getValue()?.[0].toUpperCase()}</Avatar>
+            <Text size="sm" fw={500}>{props.getValue()}</Text>
         </Group>
     }),
 
     columnHelper.accessor('email', {
         header: "Email",
-        cell: (props) => <Anchor href={`mailto:${props.getValue()}`} component={Link}>{props.getValue()}</Anchor>
+        cell: (props) => <Anchor href={`mailto:${props.getValue()}`} size="sm" component={Link}>{props.getValue()}</Anchor>
     }),
 
     columnHelper.display({
@@ -51,21 +51,21 @@ const columns = [
 
             {/* Detail */}
             <Tooltip label="Detail">
-                <ActionIcon variant="light" color="green" component={Link} href={`/dashboard/users/detail/${props.row.original.id}`}>
+                <ActionIcon variant="light" color="green" component={Link} href={`?detail=${props.row.original.id}`}>
                     <TbEye />
                 </ActionIcon>
             </Tooltip>
 
             {/* Edit */}
             <Tooltip label="Edit">
-                <ActionIcon variant="light" color="yellow" component={Link} href={`/dashboard/users/edit/${props.row.original.id}`}>
+                <ActionIcon variant="light" color="yellow" component={Link} href={`?edit=${props.row.original.id}`}>
                     <TbPencil />
                 </ActionIcon>
             </Tooltip>
 
             {/* Delete */}
             <Tooltip label="Delete">
-                <ActionIcon variant="light" color="red">
+                <ActionIcon variant="light" color="red" component={Link} href={`?delete=${props.row.original.id}`}>
                     <TbTrash />
                 </ActionIcon>
             </Tooltip>

@@ -18,7 +18,6 @@ const getUsers = async () => {
             },
             name: true,
         },
-        where: {},
     })
 
     const result = users.map((user) => ({
