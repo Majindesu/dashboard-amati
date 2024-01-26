@@ -24,6 +24,8 @@ export default function UsersTable({users}: Props) {
 		}
 	});
 
+	// TODO: Add view when data is empty
+
 	return (
 		<>
 			<Table verticalSpacing="xs" horizontalSpacing="xs">

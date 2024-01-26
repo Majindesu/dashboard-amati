@@ -29,7 +29,7 @@ const allMenu: MenuItem[] = [
 		color: "grape",
 		children: [
 			{ label: "Users", link: "/users" },
-			{ label: "Roles", link: "#" },
+			{ label: "Roles", link: "/roles" },
 			{ label: "Permissions", link: "#" },
 		],
 	},

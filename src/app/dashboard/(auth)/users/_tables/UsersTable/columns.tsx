@@ -15,7 +15,7 @@ const columnHelper = createColumnHelper<UserRow>()
 
 const columns = [
     columnHelper.display({
-        id: "seequence",
+        id: "sequence",
         header: "#",
         cell: props => props.row.index + 1,
         size: 1
