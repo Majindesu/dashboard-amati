@@ -1,4 +1,5 @@
 import CrudPermissions from "@/features/auth/types/CrudPermissions";
+import { RoleFormData } from "@/features/dashboard/roles/formSchemas/RoleFormData";
 import createActionButtons from "@/features/dashboard/utils/createActionButtons";
 import { Badge, Flex, Tooltip, ActionIcon } from "@mantine/core";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -17,10 +18,10 @@ export interface RoleRow {
 
 interface ColumnOptions {
 	permissions: Partial<CrudPermissions>;
-	actions?: {
-		detail?: () => void;
-		edit?: () => void;
-		delete?: () => void;
+	actions: {
+		detail: (id: string) => void;
+		edit: (id: string) => void;
+		delete: (id: string, name: string) => void;
 	};
 }
 
@@ -67,28 +68,28 @@ const createColumns = (options: ColumnOptions) => {
 			meta: {
 				className: "w-fit",
 			},
-			cell: () => (
+			cell: (props) => (
 				<Flex gap="xs">
                     {
                         createActionButtons([
                             {
                                 label: "Detail",
                                 permission: options.permissions.read,
-                                action: options.actions?.detail,
+                                action: () => options.actions.detail(props.row.original.id),
                                 color: "green",
                                 icon: <TbEye />
                             },
                             {
                                 label: "Edit",
                                 permission: options.permissions.update,
-                                action: options.actions?.edit,
+                                action: () => options.actions.edit(props.row.original.id),
                                 color: "yellow",
                                 icon: <TbPencil />
                             },
                             {
                                 label: "Delete",
                                 permission: options.permissions.delete,
-                                action: options.actions?.delete,
+                                action: () => options.actions.delete(props.row.original.id, props.row.original.name),
                                 color: "red",
                                 icon: <TbTrash />
                             }

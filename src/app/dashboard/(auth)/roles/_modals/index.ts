@@ -1,5 +1,4 @@
-import CreateModal from "./CreateModal";
+import FormModal from "./FormModal";
+import DeleteModal from "./DeleteModal";
 
-export {
-    CreateModal
-}
+export { DeleteModal, FormModal };

@@ -1,4 +1,5 @@
-"use client";
+/* eslint-disable react-hooks/exhaustive-deps */
+import getRoleById from "@/features/dashboard/roles/actions/getRoleById";
 import upsertRole from "@/features/dashboard/roles/actions/upsertRole";
 import roleFormDataSchema, {
 	RoleFormData,
@@ -14,59 +15,101 @@ import {
 	Button,
 	ScrollArea,
 	Checkbox,
+	Skeleton,
+	Fieldset,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
 
-interface Props {
+export interface ModalProps {
 	title: string;
 	readonly?: boolean;
-	data: RoleFormData;
+	id?: string;
 	opened: boolean;
 	onClose?: () => void;
 }
 
-export default function FormModal(props: Props) {
+/**
+ * A component for rendering a modal with a form to create or edit a role.
+ *
+ * @param props - The props for the component.
+ * @returns The rendered element.
+ */
+export default function FormModal(props: ModalProps) {
 	const router = useRouter();
+    const [isSubmitting, setSubmitting] = useState(false);
+    const [isFetching, setFetching] = useState(false);
 
-	const [isSubmitting, setSubmitting] = useState(false);
-	const [value, setValue] = useState("");
+    const form = useForm<RoleFormData>({
+        initialValues: {
+            code: "",
+            description: "",
+            id: "",
+            isActive: false,
+            name: "",
+        },
+        validate: zodResolver(roleFormDataSchema),
+        validateInputOnChange: false,
+        onValuesChange: (values) => {
+            console.log(values);
+        },
+    });
 
-	const form = useForm<RoleFormData>({
-		initialValues: props.data,
-		validate: zodResolver(roleFormDataSchema),
-		validateInputOnChange: false,
-		onValuesChange: (values) => {
-			console.log(values);
-		},
-	});
+	/**
+     * Fetches role data by ID and populates the form if the modal is opened and an ID is provided.
+     */
+	useEffect(() => {
+		if (!props.opened || !props.id) {
+			return;
+		}
+
+		setFetching(true);
+		getRoleById(props.id)
+			.then((response) => {
+				if (response.success) {
+					const data = response.data;
+					form.setValues({
+						code: data.code,
+						description: data.description,
+						id: data.id,
+						isActive: data.isActive,
+						name: data.name,
+					});
+				}
+			})
+			.catch((e) => {
+				//TODO: Handle error
+				console.log(e);
+			})
+			.finally(() => {
+				setFetching(false);
+			});
+	}, [props.opened, props.id]);
 
 	const closeModal = () => {
-		form.reset();
 		props.onClose ? props.onClose() : router.replace("?");
 	};
 
 	const handleSubmit = (values: RoleFormData) => {
 		upsertRole(values)
 			.then((response) => {
-				if (response.success){
-					showNotification(response.message,"success");
-					return closeModal()
+				if (response.success) {
+					showNotification(response.message, "success");
+					return closeModal();
 				} else {
 					form.setErrors(response.errors ?? {});
-					if (!response.errors){
-						showNotification(response.message, "error")
+					if (!response.errors) {
+						showNotification(response.message, "error");
 					}
 				}
 			})
-			.catch(e =>{
+			.catch((e) => {
 				//TODO: Handle Error
-				console.log(e)
-			}) 
-	}
+				console.log(e);
+			});
+	};
 
 	return (
 		<Modal
@@ -74,11 +117,12 @@ export default function FormModal(props: Props) {
 			onClose={closeModal}
 			title={props.title}
 			scrollAreaComponent={ScrollArea.Autosize}
+			size="xl"
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack mt="sm" gap="lg" px="lg">
 					{/* ID */}
-					{props.data.id ? (
+					{form.values.id ? (
 						<TextInput
 							label="ID"
 							readOnly
@@ -90,37 +134,45 @@ export default function FormModal(props: Props) {
 					)}
 
 					{/* Code */}
-					<TextInput
-						data-autofocus
-						label="Code"
-						readOnly={props.readonly}
-						disabled={isSubmitting}
-						{...form.getInputProps("code")}
-					/>
+					<Skeleton visible={isFetching}>
+						<TextInput
+							data-autofocus
+							label="Code"
+							readOnly={props.readonly}
+							disabled={isSubmitting}
+							{...form.getInputProps("code")}
+						/>
+					</Skeleton>
 
 					{/* Name */}
-					<TextInput
-						label="Name"
-						readOnly={props.readonly}
-						disabled={isSubmitting}
-						{...form.getInputProps("name")}
-					/>
+					<Skeleton visible={isFetching}>
+						<TextInput
+							label="Name"
+							readOnly={props.readonly}
+							disabled={isSubmitting}
+							{...form.getInputProps("name")}
+						/>
+					</Skeleton>
 
 					{/* Description */}
-					<Textarea
-						label="Description"
-						readOnly={props.readonly}
-						disabled={isSubmitting}
-						{...form.getInputProps("description")}
-					/>
+					<Skeleton visible={isFetching}>
+						<Textarea
+							label="Description"
+							readOnly={props.readonly}
+							disabled={isSubmitting}
+							{...form.getInputProps("description")}
+						/>
+					</Skeleton>
 
-					<Checkbox
-						label="Active"
-						labelPosition="right"
-						{...form.getInputProps("isActive", {
-							type: "checkbox",
-						})}
-					/>
+					<Skeleton visible={isFetching}>
+						<Checkbox
+							label="Active"
+							labelPosition="right"
+							{...form.getInputProps("isActive", {
+								type: "checkbox",
+							})}
+						/>
+					</Skeleton>
 
 					{/* Buttons */}
 					<Flex justify="flex-end" align="center" gap="lg" mt="lg">
