@@ -33,6 +33,11 @@ const columns = [
     columnHelper.accessor("userCount", {
         header: "Users"
     }),
+
+    columnHelper.display({
+        id: "Actions",
+        header: "Actions",
+    })
 ]
 
 export default columns;

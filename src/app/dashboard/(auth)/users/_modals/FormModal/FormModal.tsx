@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useForm } from "@mantine/form";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {
 	Avatar,
 	Button,
@@ -45,8 +45,6 @@ export default function FormModal(props: Props) {
 		if (isSubmitting) return;
 		router
 			.replace("?")
-			.then(() => {})
-			.catch(() => {});
 	};
 
 	/**
@@ -60,10 +58,7 @@ export default function FormModal(props: Props) {
 			.then((response) => {
 				if (response.success) {
 					showNotification(response.message);
-					router
-						.replace("?")
-						.then(() => {})
-						.catch(() => {});
+					router.replace("?")
 					return;
 				} else {
 					if (response.errors) {

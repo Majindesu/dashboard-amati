@@ -7,8 +7,13 @@ import {
 } from "@tanstack/react-table";
 import React from "react";
 import columns from "./columns";
+import CrudPermissions from "@/features/auth/types/CrudPermissions";
 
-export default function RolesTable() {
+interface Props {
+    permissions: Partial<CrudPermissions>,
+}
+
+export default function RolesTable(props: Props) {
 	const table = useReactTable({
 		data: [],
 		columns,

@@ -3,7 +3,7 @@ import "server-only"
 import { getUserFromToken } from "../authUtils";
 import getCurrentUser from "./getCurrentUser";
 
-export default async function checkPermission(permission?: "guest-only" | "authenticated-only"){
+export default async function checkPermission(permission?: "guest-only" | "authenticated-only" | string & {}){
     //TODO: Add permission check
 
 
@@ -19,5 +19,5 @@ export default async function checkPermission(permission?: "guest-only" | "authe
         return true;
     }
 
-    return false;
+    return true;
 }
