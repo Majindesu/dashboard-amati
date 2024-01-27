@@ -1,4 +1,5 @@
-"use server"
+"use server";
+
 import checkPermission from "@/features/auth/tools/checkPermission";
 import roleFormDataSchema, { RoleFormData } from "../formSchemas/RoleFormData";
 import { unauthorized } from "@/BaseError";
@@ -6,63 +7,64 @@ import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
 
-export default async function upsertRole(data: RoleFormData){
-    
-    const isInsert = !!data.id;
+/**
+ * Upserts a role based on the provided RoleFormData.
+ * If the role already exists (determined by `id`), it updates the role; otherwise, it creates a new role.
+ * Authorization checks are performed based on whether it's a create or update operation.
+ *
+ * @param {RoleFormData} data - The data for creating or updating the role.
+ * @returns {Promise<object>} An object containing the success status, message, and any errors.
+ */
+export default async function upsertRole(data: RoleFormData) {
+    const isInsert = !data.id;
 
-    if (isInsert && !await checkPermission("role.create")){
+    // Authorization check
+    const permissionType = isInsert ? "role.create" : "role.update";
+    if (!await checkPermission(permissionType)) {
         return unauthorized();
     }
 
-    if (!isInsert && !await checkPermission("role.update")){
-        return unauthorized();
-    }
-
+    // Validate form data
     const validatedFields = roleFormDataSchema.safeParse(data);
-    if (!validatedFields.success){
+    if (!validatedFields.success) {
         return {
             success: false,
             message: "Invalid Form Data",
-            errors: mapObjectToFirstValue(validatedFields.error.flatten().fieldErrors)
-        } as const
+            errors: mapObjectToFirstValue(validatedFields.error.flatten().fieldErrors),
+        };
     }
 
-    // Update user data in the database
     try {
-        if (isInsert){
-            await prisma.role.update({
-                where: { id: validatedFields.data.id!},
-                data: {
-                    code: validatedFields.data.code,
-                    description: validatedFields.data.description,
-                    isActive: validatedFields.data.isActive,
-                    name: validatedFields.data.name
-                },
-            })
+        const roleData = {
+            code: validatedFields.data.code,
+            description: validatedFields.data.description,
+            name: validatedFields.data.name,
+            isActive: validatedFields.data.isActive,
+        };
+
+        // Database operation
+        if (isInsert) {
+            await prisma.role.create({ data: roleData });
         } else {
-            await prisma.role.create({
-                data: {
-                    code: validatedFields.data.code,
-                    description: validatedFields.data.description,
-                    name: validatedFields.data.name,
-                    isActive: validatedFields.data.isActive
-                }
-            })
+            await prisma.role.update({
+                where: { id: validatedFields.data.id! },
+                data: roleData,
+            });
         }
 
         // Revalidate the cache
         revalidatePath(".");
 
+        // Return success message
         return {
             success: true,
-            message: `Role ${validatedFields.data.name} has been successfully ${isInsert ? "Updated" : "Created"}`
+            message: `Role ${validatedFields.data.name} has been successfully ${isInsert ? "created" : "updated"}.`,
         };
     } catch (error) {
-        // Consider handling specific database errors here
-        console.error('Error updating user data', error);
+        console.error('Error updating role data', error);
         return {
             success: false,
-            message: "Error updating user data"
+            message: "Error updating role data.",
         };
     }
 }

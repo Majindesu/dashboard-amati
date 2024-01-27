@@ -6,17 +6,21 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import React from "react";
-import columns from "./columns";
 import CrudPermissions from "@/features/auth/types/CrudPermissions";
+import getRoles from "@/features/dashboard/roles/data/getRoles";
+import createColumns from "./columns";
 
 interface Props {
     permissions: Partial<CrudPermissions>,
+	roles: Awaited<ReturnType<typeof getRoles>>
 }
 
 export default function RolesTable(props: Props) {
 	const table = useReactTable({
-		data: [],
-		columns,
+		data: props.roles,
+		columns: createColumns({
+			permissions: props.permissions
+		}),
 		getCoreRowModel: getCoreRowModel(),
 		defaultColumn: {
 			cell: (props) => <Text>{props.getValue() as React.ReactNode}</Text>,
