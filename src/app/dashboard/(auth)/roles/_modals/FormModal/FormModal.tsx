@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import DashboardError from "@/features/dashboard/errors/DashboardError";
 import getRoleById from "@/features/dashboard/roles/actions/getRoleById";
 import upsertRole from "@/features/dashboard/roles/actions/upsertRole";
 import roleFormDataSchema, {
 	RoleFormData,
 } from "@/features/dashboard/roles/formSchemas/RoleFormData";
+import withErrorHandling from "@/features/dashboard/utils/withServerAction";
 import { showNotification } from "@/utils/notifications";
 import {
 	Flex,
@@ -17,6 +19,7 @@ import {
 	Checkbox,
 	Skeleton,
 	Fieldset,
+	Alert,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/navigation";
@@ -39,27 +42,28 @@ export interface ModalProps {
  */
 export default function FormModal(props: ModalProps) {
 	const router = useRouter();
-    const [isSubmitting, setSubmitting] = useState(false);
-    const [isFetching, setFetching] = useState(false);
+	const [isSubmitting, setSubmitting] = useState(false);
+	const [isFetching, setFetching] = useState(false);
+	const [errorMessage, setErrorMessage] = useState("");
 
-    const form = useForm<RoleFormData>({
-        initialValues: {
-            code: "",
-            description: "",
-            id: "",
-            isActive: false,
-            name: "",
-        },
-        validate: zodResolver(roleFormDataSchema),
-        validateInputOnChange: false,
-        onValuesChange: (values) => {
-            console.log(values);
-        },
-    });
+	const form = useForm<RoleFormData>({
+		initialValues: {
+			code: "",
+			description: "",
+			id: "",
+			isActive: false,
+			name: "",
+		},
+		validate: zodResolver(roleFormDataSchema),
+		validateInputOnChange: false,
+		onValuesChange: (values) => {
+			console.log(values);
+		},
+	});
 
 	/**
-     * Fetches role data by ID and populates the form if the modal is opened and an ID is provided.
-     */
+	 * Fetches role data by ID and populates the form if the modal is opened and an ID is provided.
+	 */
 	useEffect(() => {
 		if (!props.opened || !props.id) {
 			return;
@@ -93,21 +97,29 @@ export default function FormModal(props: ModalProps) {
 	};
 
 	const handleSubmit = (values: RoleFormData) => {
-		upsertRole(values)
+		setSubmitting(true);
+		withErrorHandling(() => upsertRole(values))
 			.then((response) => {
-				if (response.success) {
-					showNotification(response.message, "success");
-					return closeModal();
-				} else {
-					form.setErrors(response.errors ?? {});
-					if (!response.errors) {
-						showNotification(response.message, "error");
-					}
-				}
+				showNotification(response.message!, "success");
+				closeModal();
 			})
 			.catch((e) => {
-				//TODO: Handle Error
-				console.log(e);
+				if (e instanceof DashboardError) {
+					if (e.errorCode === "INVALID_FORM_DATA") {
+						form.setErrors(e.formErrors ?? {});
+					} else {
+						setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
+					}
+				} else if (e instanceof Error) {
+					setErrorMessage(`ERROR: ${e.message}`);
+				} else {
+					setErrorMessage(
+						`Unkown error is occured. Please contact administrator`
+					);
+				}
+			})
+			.finally(() => {
+				setSubmitting(false);
 			});
 	};
 
@@ -121,6 +133,7 @@ export default function FormModal(props: ModalProps) {
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack mt="sm" gap="lg" px="lg">
+					{errorMessage && <Alert color="red">{errorMessage}</Alert>}
 					{/* ID */}
 					{form.values.id ? (
 						<TextInput

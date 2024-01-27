@@ -4,7 +4,7 @@ export const DashboardErrorCodes = [
     "UNAUTHORIZED",
     "NOT_FOUND",
     "UNKNOWN_ERROR",
-    "INVALID_FORM_DATA"
+    "INVALID_FORM_DATA",
 ] as const;
 
 interface ErrorOptions {
@@ -14,7 +14,7 @@ interface ErrorOptions {
 }
 
 export default class DashboardError extends Error {
-    public readonly errorCode: string;
+    public readonly errorCode: typeof DashboardErrorCodes[number] | string & {};
     public readonly formErrors?: {[k: string]: string}
     // public readonly data: object;
 
