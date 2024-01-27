@@ -1,11 +1,18 @@
-type SuccessResponse<T> = {
-    success: true,
-    data: T
-}
+type ServerResponse<T = undefined> =
+	| {
+			success: false;
+			dashboardError?: boolean;
+			error?: {
+				message?: string;
+				errorCode?: string;
+				errors?: { [k: string]: string };
+			};
+			message?: string;
+	  }
+	| {
+			success: true;
+			message?: string;
+			data?: T;
+	  };
 
-type ErrorResponse<E> = {
-    success: false,
-    error: E & {message: string}
-}
-
-type Action = SuccessResponse<> | ErrorResponse<>
+export default ServerResponse;
