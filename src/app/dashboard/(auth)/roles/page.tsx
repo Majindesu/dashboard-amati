@@ -19,10 +19,6 @@ interface Props {
     }
 }
 
-export const metadata: Metadata = {
-	title: "Roles",
-};
-
 export default async function RolesPage({searchParams}: Props) {
 	if (!(await checkPermission("role.readAll"))) {
 		return unauthorized();

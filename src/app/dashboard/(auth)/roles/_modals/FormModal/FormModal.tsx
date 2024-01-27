@@ -1,7 +1,9 @@
-"use client"
+"use client";
+import upsertRole from "@/features/dashboard/roles/actions/upsertRole";
 import roleFormDataSchema, {
 	RoleFormData,
 } from "@/features/dashboard/roles/formSchemas/RoleFormData";
+import { showNotification } from "@/utils/notifications";
 import {
 	Flex,
 	Modal,
@@ -14,6 +16,7 @@ import {
 	Checkbox,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
@@ -23,26 +26,47 @@ interface Props {
 	readonly?: boolean;
 	data: RoleFormData;
 	opened: boolean;
-	onClose?: () => void
+	onClose?: () => void;
 }
 
 export default function FormModal(props: Props) {
 	const router = useRouter();
 
 	const [isSubmitting, setSubmitting] = useState(false);
-	const [value, setValue] = useState("")
+	const [value, setValue] = useState("");
 
 	const form = useForm<RoleFormData>({
 		initialValues: props.data,
 		validate: zodResolver(roleFormDataSchema),
 		validateInputOnChange: false,
-		onValuesChange: (values) => {console.log(values)}
+		onValuesChange: (values) => {
+			console.log(values);
+		},
 	});
 
 	const closeModal = () => {
-		form.reset()
+		form.reset();
 		props.onClose ? props.onClose() : router.replace("?");
 	};
+
+	const handleSubmit = (values: RoleFormData) => {
+		upsertRole(values)
+			.then((response) => {
+				if (response.success){
+					showNotification(response.message,"success");
+					return closeModal()
+				} else {
+					form.setErrors(response.errors ?? {});
+					if (!response.errors){
+						showNotification(response.message, "error")
+					}
+				}
+			})
+			.catch(e =>{
+				//TODO: Handle Error
+				console.log(e)
+			}) 
+	}
 
 	return (
 		<Modal
@@ -51,6 +75,7 @@ export default function FormModal(props: Props) {
 			title={props.title}
 			scrollAreaComponent={ScrollArea.Autosize}
 		>
+			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack mt="sm" gap="lg" px="lg">
 					{/* ID */}
 					{props.data.id ? (
@@ -60,7 +85,9 @@ export default function FormModal(props: Props) {
 							variant="filled"
 							{...form.getInputProps("id")}
 						/>
-					) : <div></div>}
+					) : (
+						<div></div>
+					)}
 
 					{/* Code */}
 					<TextInput
@@ -76,7 +103,7 @@ export default function FormModal(props: Props) {
 						label="Name"
 						readOnly={props.readonly}
 						disabled={isSubmitting}
-						// {...form.getInputProps("name")}
+						{...form.getInputProps("name")}
 					/>
 
 					{/* Description */}
@@ -84,25 +111,15 @@ export default function FormModal(props: Props) {
 						label="Description"
 						readOnly={props.readonly}
 						disabled={isSubmitting}
-						// {...form.getInputProps("description")}
+						{...form.getInputProps("description")}
 					/>
 
-					<Checkbox label="Active" labelPosition="right" />
-
-					<Switch
-						label="Active jir"
+					<Checkbox
+						label="Active"
 						labelPosition="right"
-						// {...form.getInputProps("isActive", {
-						// 	type: "checkbox",
-						// })}
-					/>
-
-<Switch
-						label="Active jir"
-						labelPosition="left"
-						// {...form.getInputProps("isActive", {
-						// 	type: "checkbox",
-						// })}
+						{...form.getInputProps("isActive", {
+							type: "checkbox",
+						})}
 					/>
 
 					{/* Buttons */}
@@ -126,6 +143,7 @@ export default function FormModal(props: Props) {
 						)}
 					</Flex>
 				</Stack>
+			</form>
 		</Modal>
 	);
 }
