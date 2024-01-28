@@ -9,6 +9,7 @@ import UserClaims from "./types/UserClaims";
 /**
  * Hashes a plain text password using bcrypt.
  *
+ * @deprecated
  * @param password - The plain text password to hash.
  * @returns The hashed password.
  */
