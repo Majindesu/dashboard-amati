@@ -93,6 +93,7 @@ export default function FormModal(props: ModalProps) {
 	}, [props.opened, props.id]);
 
 	const closeModal = () => {
+        form.reset()
 		props.onClose ? props.onClose() : router.replace("?");
 	};
 
