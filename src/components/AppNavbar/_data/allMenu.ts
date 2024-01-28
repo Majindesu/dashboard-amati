@@ -30,7 +30,7 @@ const allMenu: MenuItem[] = [
 		children: [
 			{ label: "Users", link: "/users" },
 			{ label: "Roles", link: "/roles" },
-			{ label: "Permissions", link: "#" },
+			{ label: "Permissions", link: "/permissions" },
 		],
 	},
 	{

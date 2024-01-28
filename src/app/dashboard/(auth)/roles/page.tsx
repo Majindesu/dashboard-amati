@@ -4,6 +4,7 @@ import React from "react";
 import RolesTable from "./_tables/RolesTable/RolesTable";
 import getRoles from "@/features/dashboard/roles/data/getRoles";
 import checkMultiplePermissions from "@/features/auth/tools/checkMultiplePermissions";
+import { unauthorized } from "@/features/dashboard/errors/DashboardError";
 
 interface Props {
 	searchParams: {
@@ -26,6 +27,8 @@ export default async function RolesPage({ searchParams }: Props) {
 		update: "role.update",
 		delete: "role.delete",
 	});
+
+	if (!permissions.readAll) unauthorized()
 
 	const roles = await getRoles();
 

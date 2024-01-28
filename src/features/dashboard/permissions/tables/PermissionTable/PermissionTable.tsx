@@ -7,23 +7,21 @@ import {
 } from "@tanstack/react-table";
 import React, { useState } from "react";
 import CrudPermissions from "@/features/auth/types/CrudPermissions";
-import getRoles from "@/features/dashboard/roles/data/getRoles";
-import createColumns from "./columns";
-import FormModal from "../../_modals/FormModal";
-import { ModalProps } from "../../_modals/FormModal/FormModal";
 import { TbPlus } from "react-icons/tb";
-import { RoleFormData } from "@/features/dashboard/roles/formSchemas/RoleFormData";
+import { PermissionFormData } from "@/features/dashboard/permissions/formSchemas/PermissionFormData";
 import { string } from "zod";
-import { DeleteModal } from "../../_modals";
-import { DeleteModalProps } from "../../_modals/DeleteModal/DeleteModal";
 import { DashboardTable } from "@/features/dashboard/components";
+import getPermissions from "../../data/getPermissions";
+import FormModal, { ModalProps } from "../../modals/FormModal/FormModal";
+import DeleteModal, { DeleteModalProps } from "../../modals/DeleteModal/DeleteModal";
+import createColumns from "./_columns";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	roles: Awaited<ReturnType<typeof getRoles>>;
+	permissionData: Awaited<ReturnType<typeof getPermissions>>;
 }
 
-export default function RolesTable(props: Props) {
+export default function PermissionsTable(props: Props) {
 	const [modalProps, setModalProps] = useState<ModalProps>({
 		opened: false,
 		title: "",
@@ -36,7 +34,7 @@ export default function RolesTable(props: Props) {
 	});
 
 	const table = useReactTable({
-		data: props.roles,
+		data: props.permissionData,
 		columns: createColumns({
 			permissions: props.permissions,
 			actions: {
@@ -56,7 +54,7 @@ export default function RolesTable(props: Props) {
 			setModalProps({
 				id,
 				opened: true,
-				title: "Create new role",
+				title: "Create new permission",
 			});
 		};
 
@@ -64,7 +62,7 @@ export default function RolesTable(props: Props) {
 			setModalProps({
 				id,
 				opened: true,
-				title: "Role detail",
+				title: "Permission detail",
 				readonly: true,
 			});
 		};
@@ -73,7 +71,7 @@ export default function RolesTable(props: Props) {
 			setModalProps({
 				id,
 				opened: true,
-				title: "Edit role",
+				title: "Edit permission",
 			});
 		};
 
@@ -111,7 +109,7 @@ export default function RolesTable(props: Props) {
 						leftSection={<TbPlus />}
 						onClick={() => openFormModal("create")}
 					>
-						New Role
+						New Permission
 					</Button>
 				)}
 			</Flex>
