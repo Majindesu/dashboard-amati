@@ -73,6 +73,8 @@ export async function getUserFromToken(token: string) {
 	const user = await prisma.user.findFirst({
         include:{
             photoProfile: true,
+			roles: true,
+			directPermissions: true
         },
 		where: {
 			id: decodedToken.id,
