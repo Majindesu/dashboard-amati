@@ -6,6 +6,7 @@ export interface RoleFormData {
     code: string;
     description: string;
     isActive: boolean;
+    permissions: string[]
 }
 
 const roleFormDataSchema = z.object({
@@ -14,6 +15,7 @@ const roleFormDataSchema = z.object({
     code: z.string().min(1),
     description: z.string(),
     isActive: z.boolean(),
+    permissions: z.array(z.string()).optional().default([]),
 })
 
 export default roleFormDataSchema;

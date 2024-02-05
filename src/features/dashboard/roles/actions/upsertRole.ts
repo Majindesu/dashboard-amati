@@ -6,7 +6,10 @@ import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
 import ServerResponse from "@/types/Action";
-import DashboardError, { handleCatch, unauthorized } from "../../errors/DashboardError";
+import DashboardError, {
+	handleCatch,
+	unauthorized,
+} from "../../errors/DashboardError";
 
 /**
  * Upserts a role based on the provided RoleFormData.
@@ -32,9 +35,11 @@ export default async function upsertRole(
 		const validatedFields = roleFormDataSchema.safeParse(data);
 		if (!validatedFields.success) {
 			throw new DashboardError({
-                errorCode: "INVALID_FORM_DATA",
-                formErrors: mapObjectToFirstValue(validatedFields.error.flatten().fieldErrors)
-            })
+				errorCode: "INVALID_FORM_DATA",
+				formErrors: mapObjectToFirstValue(
+					validatedFields.error.flatten().fieldErrors
+				),
+			});
 		}
 		const roleData = {
 			code: validatedFields.data.code,
@@ -43,25 +48,38 @@ export default async function upsertRole(
 			isActive: validatedFields.data.isActive,
 		};
 
+		const permissionIds = validatedFields.data.permissions.map(
+			(permission) => ({ code: permission })
+		);
+
 		// Database operation
 		if (isInsert) {
-            if (await prisma.role.findFirst({
-                where: {
-                    code: roleData.code
-                }
-            })){
-                throw new DashboardError({
-                    errorCode: "INVALID_FORM_DATA",
-                    formErrors: {
-                        code: "The code is already exists"
-                    }
-                })
-            }
-			await prisma.role.create({ data: roleData });
+			if (
+				await prisma.role.findFirst({
+					where: {
+						code: roleData.code,
+					},
+				})
+			) {
+				throw new DashboardError({
+					errorCode: "INVALID_FORM_DATA",
+					formErrors: {
+						code: "The code is already exists",
+					},
+				});
+			}
+			await prisma.role.create({
+				data: {
+					...roleData,
+					permissions: {
+						connect: permissionIds,
+					},
+				},
+			});
 		} else {
 			await prisma.role.update({
 				where: { id: validatedFields.data.id! },
-				data: roleData,
+				data: { ...roleData, permissions: { connect: permissionIds } },
 			});
 		}
 
@@ -76,6 +94,6 @@ export default async function upsertRole(
 			}.`,
 		};
 	} catch (error) {
-		return handleCatch(error)
+		return handleCatch(error);
 	}
 }

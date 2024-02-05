@@ -11,7 +11,7 @@ import "server-only";
  */
 export default async function getPermissions() {
 	// Authorization check
-	if (!(await checkPermission("permissions.getAll"))) {
+	if (!(await checkPermission("permissions.readAll"))) {
 		return unauthorized();
 	}
 

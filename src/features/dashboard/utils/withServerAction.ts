@@ -1,11 +1,22 @@
-import ServerResponse from "@/types/Action";
+import ServerResponse, { SuccessResponse } from "@/types/Action";
 import DashboardError from "../errors/DashboardError";
 
-async function withErrorHandling<T extends ServerResponse>(
-	asyncFunction: () => Promise<T>
-): Promise<T> {
-	const result = await asyncFunction();
-	if (result.success) {
+/**
+ * A higher-order function that wraps an async function and provides structured error handling.
+ * If the wrapped function returns a successful response, it's returned directly.
+ * If an error occurs, it throws a DashboardError for dashboard-related errors or a generic Error otherwise.
+ * 
+ * @param asyncFunction - The async function to wrap.
+ * @param args - The arguments to pass to the async function.
+ * @returns The successful response from the async function.
+ * @throws DashboardError for dashboard-related errors or Error for other errors.
+ */
+async function withErrorHandling<T, Args extends unknown[] = []>(
+	asyncFunction: (...args: Args) => Promise<ServerResponse<T>>,
+	...args: Args
+){
+	const result = await asyncFunction(...args);
+	if (result.success === true) {
         return result;
 	} else {
         if (result.dashboardError && result.error) {

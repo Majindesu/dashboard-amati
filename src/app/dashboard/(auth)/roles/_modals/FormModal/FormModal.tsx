@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DashboardError from "@/features/dashboard/errors/DashboardError";
+import getAllPermissions from "@/features/dashboard/permissions/actions/getAllPermissions";
 import getRoleById from "@/features/dashboard/roles/actions/getRoleById";
 import upsertRole from "@/features/dashboard/roles/actions/upsertRole";
 import roleFormDataSchema, {
@@ -20,11 +21,13 @@ import {
 	Skeleton,
 	Fieldset,
 	Alert,
+	Chip,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
+import { string } from "zod";
 
 export interface ModalProps {
 	title: string;
@@ -45,6 +48,9 @@ export default function FormModal(props: ModalProps) {
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [isFetching, setFetching] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
+	const [allPermissions, setAllPermissions] = useState<
+		{ code: string; name: string }[] | undefined
+	>(undefined);
 
 	const form = useForm<RoleFormData>({
 		initialValues: {
@@ -53,6 +59,7 @@ export default function FormModal(props: ModalProps) {
 			id: "",
 			isActive: false,
 			name: "",
+			permissions: [],
 		},
 		validate: zodResolver(roleFormDataSchema),
 		validateInputOnChange: false,
@@ -60,6 +67,29 @@ export default function FormModal(props: ModalProps) {
 			console.log(values);
 		},
 	});
+
+	//Fetch Permissions
+	useEffect(() => {
+		setFetching(true);
+		withErrorHandling(getAllPermissions)
+			.then((response) => {
+				setAllPermissions(response.data);
+			})
+			.catch((e) => {
+				if (e instanceof DashboardError) {
+					setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
+				} else if (e instanceof Error) {
+					setErrorMessage(`ERROR: ${e.message}`);
+				} else {
+					setErrorMessage(
+						`Unkown error is occured. Please contact administrator`
+					);
+				}
+			})
+			.finally(() => {
+				setFetching(false);
+			});
+	}, []);
 
 	/**
 	 * Fetches role data by ID and populates the form if the modal is opened and an ID is provided.
@@ -70,22 +100,30 @@ export default function FormModal(props: ModalProps) {
 		}
 
 		setFetching(true);
-		getRoleById(props.id)
+		withErrorHandling(getRoleById, props.id)
 			.then((response) => {
-				if (response.success) {
-					const data = response.data;
-					form.setValues({
-						code: data.code,
-						description: data.description,
-						id: data.id,
-						isActive: data.isActive,
-						name: data.name,
-					});
-				}
+				const data = response.data;
+				form.setValues({
+					code: data.code,
+					description: data.description,
+					id: data.id,
+					isActive: data.isActive,
+					name: data.name,
+					permissions: data.permissions.map(
+						(permission) => permission.code
+					),
+				});
 			})
 			.catch((e) => {
-				//TODO: Handle error
-				console.log(e);
+				if (e instanceof DashboardError) {
+					setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
+				} else if (e instanceof Error) {
+					setErrorMessage(`ERROR: ${e.message}`);
+				} else {
+					setErrorMessage(
+						`Unkown error is occured. Please contact administrator`
+					);
+				}
 			})
 			.finally(() => {
 				setFetching(false);
@@ -94,11 +132,12 @@ export default function FormModal(props: ModalProps) {
 
 	const closeModal = () => {
 		props.onClose ? props.onClose() : router.replace("?");
+		form.reset();
 	};
 
 	const handleSubmit = (values: RoleFormData) => {
 		setSubmitting(true);
-		withErrorHandling(() => upsertRole(values))
+		withErrorHandling(upsertRole, values)
 			.then((response) => {
 				showNotification(response.message!, "success");
 				closeModal();
@@ -186,6 +225,30 @@ export default function FormModal(props: ModalProps) {
 							})}
 						/>
 					</Skeleton>
+
+					<Fieldset legend="Permissions">
+						<Chip.Group
+							multiple
+							value={form.values.permissions}
+							onChange={(values) =>
+								!props.readonly &&
+								form.setFieldValue("permissions", values)
+							}
+						>
+							<Flex wrap="wrap" gap="md">
+								{allPermissions?.map((permission) => (
+									<div key={permission.code}>
+										<Chip
+											disabled={isSubmitting}
+											value={permission.code}
+										>
+											{permission.code}
+										</Chip>
+									</div>
+								))}
+							</Flex>
+						</Chip.Group>
+					</Fieldset>
 
 					{/* Buttons */}
 					<Flex justify="flex-end" align="center" gap="lg" mt="lg">

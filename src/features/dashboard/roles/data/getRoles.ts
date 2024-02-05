@@ -1,7 +1,7 @@
-import { unauthorized } from "@/BaseError";
 import prisma from "@/db";
 import checkPermission from "@/features/auth/tools/checkPermission";
 import "server-only";
+import { unauthorized } from "@/features/dashboard/errors/DashboardError";
 
 /**
  * Retrieves all roles along with the count of associated permissions and users.

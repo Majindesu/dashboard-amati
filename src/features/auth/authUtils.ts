@@ -5,6 +5,8 @@ import prisma from "@/db";
 import AuthError, { AuthErrorCode } from "./AuthError";
 import authConfig from "@/config/auth";
 import UserClaims from "./types/UserClaims";
+import { cache } from "react";
+import BaseError from "@/BaseError";
 
 /**
  * Hashes a plain text password using bcrypt.
@@ -64,22 +66,31 @@ export function decodeJwtToken(token: string): JwtPayload | string {
 	}
 }
 
-export async function getUserFromToken(token: string) {
-	const decodedToken = decodeJwtToken(token) as {
-		id: string;
-		iat: number;
-	};
+/**
+ * Retrieves user data from the database based on the provided JWT token.
+ * 
+ * This function decodes the JWT token to extract the user ID, and then queries the database using Prisma
+ * to fetch the user's details, including the profile photo, roles, and direct permissions.
+ * 
+ * @param token - The JWT token containing the user's ID.
+ * @returns The user's data if the user exists, or null if no user is found. 
+ * Throws an error if the token is invalid or the database query fails.
+ */
+export const getUserFromToken = cache(async (token: string) => {
+	// Decode the JWT token to extract the user ID
+	const decodedToken = decodeJwtToken(token) as { id: string; iat: number; };
 
+	// Fetch the user from the database
 	const user = await prisma.user.findFirst({
-        include:{
-            photoProfile: true,
+		include: {
+			photoProfile: true,
 			roles: true,
 			directPermissions: true
-        },
+		},
 		where: {
 			id: decodedToken.id,
 		},
 	});
 
 	return user;
-}
+})

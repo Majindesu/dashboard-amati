@@ -1,40 +1,56 @@
 "use server";
 
-import { unauthorized } from "@/BaseError";
 import prisma from "@/db";
 import checkPermission from "@/features/auth/tools/checkPermission";
+import { handleCatch, notFound, unauthorized } from "../../errors/DashboardError";
+import ServerResponse from "@/types/Action";
 
-export default async function getRoleById(id: string) {
-	if (!(await checkPermission("role.read"))) unauthorized();
+type RoleData = {
+	id: string;
+    code: string;
+    name: string;
+    description: string;
+    isActive: boolean;
+    permissions: {
+        id: string;
+        code: string;
+        name: string;
+    }[]
+}
 
-	const role = await prisma.role.findFirst({
-		where: { id },
-		select: {
-			code: true,
-			description: true,
-			id: true,
-			isActive: true,
-			name: true,
-			permissions: {
-				select: {
-					id: true,
-					code: true,
-					name: true,
+export default async function getRoleById(id: string): Promise<ServerResponse<RoleData>>{
+	try{
+
+		if (!(await checkPermission("role.read"))) return unauthorized();
+
+		const role = await prisma.role.findFirst({
+			where: { id },
+			select: {
+				code: true,
+				description: true,
+				id: true,
+				isActive: true,
+				name: true,
+				permissions: {
+					select: {
+						id: true,
+						code: true,
+						name: true,
+					},
 				},
 			},
-		},
-	});
+		});
 
-	if (!role) {
+		if (!role) {
+			throw new Error("Permission not found")
+		}
+
 		return {
-			success: false,
-			message: "Role not found",
-		} as const;
+			success: true,
+			message: "Role fetched successfully",
+			data: role,
+		};
+	} catch (e){
+		return handleCatch(e)
 	}
-
-	return {
-		success: true,
-		message: "Role fetched successfully",
-		data: role,
-	} as const;
 }
