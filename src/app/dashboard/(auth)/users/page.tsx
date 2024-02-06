@@ -46,8 +46,6 @@ export default async function UsersPage({searchParams}: Props) {
 		return null;
 	}
 
-	// TODO: Add functinoality for create new user
-
 	return (
 		<Stack className="flex flex-col">
 			<Title order={1}>Users</Title>
