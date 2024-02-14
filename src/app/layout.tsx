@@ -6,8 +6,8 @@ import "@mantine/core/styles.css";
 import '@mantine/notifications/styles.css';
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { AuthContextProvider } from "@/features/auth/contexts/AuthContext";
 import { Notifications } from "@mantine/notifications";
+import { AuthContextProvider } from "@/modules/auth/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 

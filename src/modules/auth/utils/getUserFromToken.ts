@@ -19,7 +19,6 @@ const getUserFromToken = cache(async (token: string) => {
 	// Fetch the user from the database
 	const user = await prisma.user.findFirst({
 		include: {
-			photoProfile: true,
 			roles: true,
 			directPermissions: true,
 		},
