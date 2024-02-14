@@ -1,5 +1,4 @@
-import { ThemeIconProps } from "@mantine/core";
-import React from "react";
+"use server";
 import {
 	TbLayoutDashboard,
 	TbUsers,
@@ -8,25 +7,40 @@ import {
 	TbPhotoFilled,
 } from "react-icons/tb";
 import SidebarMenu from "../types/SidebarMenu";
+import "server-only";
+import getCurrentUser from "@/modules/auth/utils/getCurrentUser";
+import ServerResponseAction from "../types/ServerResponseAction";
+import handleCatch from "../utils/handleCatch";
+import getUserRoles from "@/modules/auth/utils/getUserRoles";
+import getUserPermissions from "@/modules/auth/utils/getUserPermissions";
 
 const sidebarMenus: SidebarMenu[] = [
 	{
 		label: "Dashboard",
-		icon: TbLayoutDashboard,
+		icon: "TbLayoutDashboard",
+		allowedPermissions: ["*"],
 	},
 	{
 		label: "Users",
-		icon: TbUsers,
+		icon: "TbUsers",
 		color: "grape",
 		children: [
-			{ label: "Users", link: "/users" },
-			{ label: "Roles", link: "/roles" },
-			{ label: "Permissions", link: "/permissions" },
+			{
+				label: "Users",
+				link: "/users",
+				allowedPermissions: ["users.getAll"],
+			},
+			{ label: "Roles", link: "/roles", allowedRoles: ["super-admin"] },
+			{
+				label: "Permissions",
+				link: "/permissions",
+				allowedRoles: ["super-admin"],
+			},
 		],
 	},
 	{
 		label: "Blog",
-		icon: TbNotebook,
+		icon: "TbNotebook",
 		color: "green",
 		children: [
 			{ label: "Posts", link: "#" },
@@ -36,17 +50,78 @@ const sidebarMenus: SidebarMenu[] = [
 	},
 	{
 		label: "Products",
-		icon: TbShoppingBag,
+		icon: "TbShoppingBag",
 		color: "cyan",
 	},
 	{
 		label: "Banners",
-		icon: TbPhotoFilled,
+		icon: "TbPhotoFilled",
 		color: "indigo",
 	},
 ];
 
-//TODO: Change into server actions
-const getSidebarMenus = () => sidebarMenus;
+export default async function getSidebarMenus(): Promise<
+	ServerResponseAction<SidebarMenu[]>
+> {
+	try {
+		const filteredMenus: SidebarMenu[] = [];
 
-export default getSidebarMenus;
+		const roles = await getUserRoles();
+		const permissions = await getUserPermissions();
+
+		for (let menu of sidebarMenus) {
+			console.log("aaa");
+			//if has children
+			if (menu.children) {
+				const currentMenuChildren: SidebarMenu["children"] = [];
+				for (let menuChild of menu.children) {
+					if (
+						menuChild.allowedPermissions?.some((perm) =>
+							permissions?.includes(perm)
+						) ||
+						menuChild.allowedRoles?.some((role) =>
+							roles?.includes(role)
+						) ||
+						menuChild.allowedPermissions?.includes("*") ||
+						menuChild.allowedRoles?.includes("*")
+					)
+						currentMenuChildren.push(menuChild);
+				}
+
+				if (currentMenuChildren.length > 0) {
+					filteredMenus.push({
+						...menu,
+						children: currentMenuChildren,
+					});
+				}
+			}
+			//if does not have any children
+			else {
+				// console.table({
+				// 	allowedPermissions: menu.allowedPermissions,
+				// 	userPermissions: permissions
+				// })
+				if (
+					menu.allowedPermissions?.some((perm) =>
+						permissions?.includes(perm)
+					) ||
+					menu.allowedRoles?.some((role) => roles?.includes(role)) ||
+					menu.allowedPermissions?.includes("*") ||
+					menu.allowedRoles?.includes("*")
+				) {
+					filteredMenus.push(menu);
+				}
+			}
+		}
+
+		console.log("permissions", permissions);
+		console.log("menus", filteredMenus);
+
+		return {
+			success: true,
+			data: filteredMenus,
+		};
+	} catch (e) {
+		return handleCatch(e);
+	}
+}

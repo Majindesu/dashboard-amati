@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 
 import {
 	Box,
@@ -9,6 +9,7 @@ import {
 	rem,
 } from "@mantine/core";
 import { TbChevronRight } from "react-icons/tb";
+import * as TbIcons from "react-icons/tb";
 
 import ChildMenu from "./SidebarChildMenu";
 import classNames from "./styles/sidebarMenuItem.module.css";
@@ -40,6 +41,11 @@ export default function MenuItem({ menu }: Props) {
 		<ChildMenu key={index} item={child} />
 	));
 
+	const Icons = TbIcons as any;
+
+	const Icon = typeof menu.icon === "string" ? Icons[menu.icon] : menu.icon;
+	// const a = typeof menu.icon === "string"
+
 	return (
 		<>
 			{/* Main Menu Item */}
@@ -51,9 +57,7 @@ export default function MenuItem({ menu }: Props) {
 					{/* Icon and Label */}
 					<Box style={{ display: "flex", alignItems: "center" }}>
 						<ThemeIcon variant="light" size={30} color={menu.color}>
-							<menu.icon
-								style={{ width: rem(18), height: rem(18) }}
-							/>
+							<Icon style={{ width: rem(18), height: rem(18) }} />
 						</ThemeIcon>
 
 						<Box ml="md">{menu.label}</Box>

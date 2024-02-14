@@ -1,5 +1,6 @@
 import getCurrentUser from "./getCurrentUser";
 import "server-only";
+import getUserPermissions from "./getUserPermissions";
 
 /**
  * Deprecated. Use dashboard service instead
@@ -11,11 +12,11 @@ import "server-only";
  * @returns true if the user has the required permission, otherwise false.
  */
 export default async function checkPermission(
-	permission?: "guest-only" | "authenticated-only" | (string & {}),
+	permission: "guest-only" | "authenticated-only" | "*" | (string & {}),
 	currentUser?: Awaited<ReturnType<typeof getCurrentUser>>
 ): Promise<boolean> {
 	// Allow if no specific permission is required.
-	if (!permission) return true;
+	if (permission === "*") return true;
 
 	// Retrieve current user if not provided.
 	const user = currentUser ?? (await getCurrentUser());
@@ -34,11 +35,8 @@ export default async function checkPermission(
 	if (user.roles.some((role) => role.code === "super-admin")) return true;
 
 	// Aggregate all role codes and direct permissions into a set for efficient lookup.
-	const permissions = new Set<string>([
-		...user.roles.map((role) => role.code),
-		...user.directPermissions.map((dp) => dp.code),
-	]);
+	const permissions = await getUserPermissions()
 
 	// Check if the user has the required permission.
-	return permissions.has(permission);
+	return permissions.includes(permission);
 }

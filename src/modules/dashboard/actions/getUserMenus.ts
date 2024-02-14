@@ -6,10 +6,10 @@ import { UserMenuItem } from "../types/UserMenuItem";
 
 // This function retrieves the list of user menu items for use in the application's header.
 const userMenuItems: UserMenuItem[] = [
-	{
-		label: "Account Settings",
-		icon: TbSettings,
-	},
+	// {
+	// 	label: "Account Settings",
+	// 	icon: TbSettings,
+	// },
 	{
 		label: "Logout",
 		icon: TbLogout,
