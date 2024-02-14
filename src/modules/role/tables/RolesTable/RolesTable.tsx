@@ -9,10 +9,11 @@ import FormModal, { ModalProps } from "../../modals/FormModal";
 import DeleteModal, { DeleteModalProps } from "../../modals/DeleteModal";
 import createColumns from "./columns";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
+import Role from "../../types/Role";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	roles: Awaited<ReturnType<typeof getAllRoles>>;
+	roles: Role[];
 }
 
 export default function RolesTable(props: Props) {

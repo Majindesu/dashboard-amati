@@ -28,7 +28,7 @@ export default async function RolesPage({ searchParams }: Props) {
 	});
 
 	const res = await getAllPermissions();
-	if (!res.success) throw new Error();
+	if (!res.success) throw new Error("Error while fetch permission");
     
 	return (
 		<Stack>

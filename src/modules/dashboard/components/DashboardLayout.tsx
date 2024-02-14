@@ -45,7 +45,7 @@ export default function DashboardLayout(props: Props) {
 			{/* Navbar */}
 			<AppNavbar />
 
-			<AppShell.Main className="bg-slate-100">
+			<AppShell.Main className="bg-slate-100" styles={{main: {backgroundColor: "rgb(241 245 249)"}}}>
 				{props.children}
 			</AppShell.Main>
 		</AppShell>

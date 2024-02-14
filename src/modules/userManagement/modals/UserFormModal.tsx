@@ -16,6 +16,7 @@ import {
 	Center,
 	Avatar,
 	PasswordInput,
+	MultiSelect,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,8 @@ import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import upsertUser from "../actions/upsertUser";
 import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import stringToColorHex from "@/core/utils/stringToColorHex";
+import getAllRoles from "@/modules/role/actions/getAllRoles";
+import Role from "@/modules/role/types/Role";
 
 export interface ModalProps {
 	title: string;
@@ -49,6 +52,7 @@ export default function UserFormModal(props: ModalProps) {
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [isFetching, setFetching] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
+	const [roles, setRoles] = useState<Role[]>([]);
 
 	const form = useForm<UserFormData>({
 		initialValues: {
@@ -57,6 +61,7 @@ export default function UserFormModal(props: ModalProps) {
 			name: "",
 			photoProfileUrl: "",
 			password: "",
+			roles: [],
 		},
 		validate: zodResolver(userFormDataSchema),
 		validateInputOnChange: false,
@@ -80,6 +85,7 @@ export default function UserFormModal(props: ModalProps) {
 						id: data.id,
 						name: data.name,
 						photoProfileUrl: data.photoProfileUrl,
+						roles: data.roles.map(role => role.code)
 					});
 				}
 			})
@@ -91,6 +97,17 @@ export default function UserFormModal(props: ModalProps) {
 				setFetching(false);
 			});
 	}, [props.opened, props.id]);
+
+	// Fetch Roles
+	useEffect(() => {
+		withServerAction(getAllRoles)
+			.then((response) => {
+				setRoles(response.data);
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	}, []);
 
 	const closeModal = () => {
 		form.reset();
@@ -189,6 +206,19 @@ export default function UserFormModal(props: ModalProps) {
 							{...form.getInputProps("password")}
 						/>
 					)}
+
+					{/* Role */}
+					<MultiSelect
+						label="Roles"
+						readOnly={props.readonly}
+						disabled={isSubmitting}
+						value={form.values.roles}
+						onChange={(values) =>
+							form.setFieldValue("roles", values)
+						}
+						data={roles.map((role) => role.code)}
+						error={form.errors.roles}
+					/>
 
 					{/* Buttons */}
 					<Flex justify="flex-end" align="center" gap="lg" mt="lg">

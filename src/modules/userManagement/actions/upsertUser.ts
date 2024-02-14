@@ -49,7 +49,19 @@ export default async function upsertUser(
 			photoProfile: validatedFields.data.photoProfileUrl ?? "",
 			email: validatedFields.data.email,
 		};
+
 		const passwordHash = await hashPassword(validatedFields.data.password!);
+
+		const roles = await prisma.role.findMany({
+			where: {
+				code: {
+					in: validatedFields.data.roles,
+				},
+			},
+			select: {
+				id: true, // Only select the id field
+			},
+		});
 
 		// Database operation
 		if (isInsert) {
@@ -67,11 +79,24 @@ export default async function upsertUser(
 					},
 				});
 			}
-			await prisma.user.create({ data: { ...userData, passwordHash } });
+			await prisma.user.create({
+				data: {
+					...userData,
+					passwordHash,
+					roles: {
+						connect: roles.map((role) => ({ id: role.id })),
+					},
+				},
+			});
 		} else {
 			await prisma.user.update({
 				where: { id: validatedFields.data.id! },
-				data: userData,
+				data: {
+					...userData,
+					roles: {
+						set: roles.map((role) => ({ id: role.id })),
+					},
+				},
 			});
 		}
 

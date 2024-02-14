@@ -30,13 +30,14 @@ export default async function RolesPage() {
 
 	if (!permissions.readAll) unauthorized()
 
-	const roles = await getAllRoles();
+	const res = await getAllRoles();
+	if (!res.success) throw new Error("Error while fetch roles");
 
 	return (
 		<Stack>
 			<Title order={1}>Roles</Title>
 			<Card>
-				<RolesTable permissions={permissions} roles={roles} />
+				<RolesTable permissions={permissions} roles={res.data} />
 			</Card>
 		</Stack>
 	);
