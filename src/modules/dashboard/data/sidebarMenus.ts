@@ -25,25 +25,23 @@ const sidebarMenus: SidebarMenu[] = [
 		],
 	},
 	{
-		label: "Blog",
-		icon: "TbNotebook",
-		color: "green",
+		label: "Reseller Office 365",
+		icon: "TbBuildingStore",
+		color: "red",
+		allowedPermissions: ["*"],
 		children: [
-			{ label: "Posts", link: "#" },
-			{ label: "Categories", link: "#" },
-			{ label: "Tags", link: "#" },
-		],
-	},
-	{
-		label: "Products",
-		icon: "TbShoppingBag",
-		color: "cyan",
-	},
-	{
-		label: "Banners",
-		icon: "TbPhotoFilled",
-		color: "indigo",
-	},
+			{
+				label: "Request Link",
+				link: "/reseller-office-365/request",
+				allowedRoles: ["*"]
+			},
+			{
+				label: "Respond Request Link",
+				link: "#",
+				allowedRoles: ["*"]
+			}
+		]
+	}
 ];
 
 export default sidebarMenus;
