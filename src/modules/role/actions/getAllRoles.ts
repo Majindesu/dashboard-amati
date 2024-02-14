@@ -1,7 +1,8 @@
+"use server"
 import prisma from "@/db";
-import checkPermission from "@/features/auth/tools/checkPermission";
+import checkPermission from "@/modules/dashboard/services/checkPermission";
+import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import "server-only";
-import { unauthorized } from "@/features/dashboard/errors/DashboardError";
 
 /**
  * Retrieves all roles along with the count of associated permissions and users.
@@ -9,10 +10,10 @@ import { unauthorized } from "@/features/dashboard/errors/DashboardError";
  *
  * @returns An array of role objects each including details and counts of related permissions and users.
  */
-export default async function getRoles() {
+export default async function getAllRoles() {
     // Authorization check
     if (!await checkPermission("roles.getAll")) {
-        return unauthorized();
+        unauthorized();
     }
 
     try {

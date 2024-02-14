@@ -2,24 +2,16 @@
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
-	Avatar,
 	Button,
-	Center,
 	Flex,
 	Modal,
-	ScrollArea,
 	Text,
-	Stack,
-	TextInput,
-	Title,
 	Alert,
 } from "@mantine/core";
 import { showNotification } from "@/utils/notifications";
-import deleteRole from "@/features/dashboard/roles/actions/deleteRole";
-import withErrorHandling from "@/features/dashboard/utils/withServerAction";
-import { error } from "console";
-import DashboardError from "@/features/dashboard/errors/DashboardError";
-import { revalidatePath } from "next/cache";
+import withServerAction from "@/modules/dashboard/utils/withServerAction";
+import deleteRole from "../actions/deleteRole";
+import DashboardError from "@/modules/dashboard/errors/DashboardError";
 
 export interface DeleteModalProps {
 	data?: {
@@ -48,7 +40,7 @@ export default function DeleteModal(props: DeleteModalProps) {
 		if (!props.data?.id) return;
 		setSubmitting(true);
 
-		withErrorHandling(() => deleteRole(props.data!.id))
+		withServerAction(deleteRole, props.data!.id)
 			.then((response) => {
 				showNotification(
 					response.message ?? "Role deleted successfully"

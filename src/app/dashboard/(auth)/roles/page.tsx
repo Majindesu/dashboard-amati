@@ -1,10 +1,10 @@
+import checkMultiplePermissions from "@/modules/dashboard/services/checkMultiplePermissions";
+import unauthorized from "@/modules/dashboard/utils/unauthorized";
+import getAllRoles from "@/modules/role/actions/getAllRoles";
+import RolesTable from "@/modules/role/tables/RolesTable/RolesTable";
 import { Card, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import React from "react";
-import RolesTable from "./_tables/RolesTable/RolesTable";
-import getRoles from "@/features/dashboard/roles/data/getRoles";
-import checkMultiplePermissions from "@/features/auth/tools/checkMultiplePermissions";
-import { unauthorized } from "@/features/dashboard/errors/DashboardError";
 
 interface Props {
 	searchParams: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 	title: "Roles - Dashboard",
 };
 
-export default async function RolesPage({ searchParams }: Props) {
+export default async function RolesPage() {
 	const permissions = await checkMultiplePermissions({
 		create: "role.create",
 		readAll: "role.readAll",
@@ -30,7 +30,7 @@ export default async function RolesPage({ searchParams }: Props) {
 
 	if (!permissions.readAll) unauthorized()
 
-	const roles = await getRoles();
+	const roles = await getAllRoles();
 
 	return (
 		<Stack>

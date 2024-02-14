@@ -1,9 +1,10 @@
 "use server";
 
 import prisma from "@/db";
-import checkPermission from "@/features/auth/tools/checkPermission";
-import { handleCatch, notFound, unauthorized } from "../../errors/DashboardError";
-import ServerResponse from "@/types/Action";
+import checkPermission from "@/modules/dashboard/services/checkPermission";
+import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
+import handleCatch from "@/modules/dashboard/utils/handleCatch";
+import unauthorized from "@/modules/dashboard/utils/unauthorized";
 
 type RoleData = {
 	id: string;
@@ -18,10 +19,10 @@ type RoleData = {
     }[]
 }
 
-export default async function getRoleById(id: string): Promise<ServerResponse<RoleData>>{
+export default async function getRoleById(id: string): Promise<ServerResponseAction<RoleData>>{
 	try{
 
-		if (!(await checkPermission("role.read"))) return unauthorized();
+		if (!(await checkPermission("roles.read"))) return unauthorized();
 
 		const role = await prisma.role.findFirst({
 			where: { id },

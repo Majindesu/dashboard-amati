@@ -1,6 +1,5 @@
-import CrudPermissions from "@/features/auth/types/CrudPermissions";
-import { RoleFormData } from "@/features/dashboard/roles/formSchemas/RoleFormData";
-import createActionButtons from "@/features/dashboard/utils/createActionButtons";
+import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
+import createActionButtons from "@/modules/dashboard/utils/createActionButton";
 import { Badge, Flex, Tooltip, ActionIcon } from "@mantine/core";
 import { createColumnHelper } from "@tanstack/react-table";
 import Link from "next/link";

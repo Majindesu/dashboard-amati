@@ -1,15 +1,14 @@
 "use server";
 
-import checkPermission from "@/features/auth/tools/checkPermission";
 import roleFormDataSchema, { RoleFormData } from "../formSchemas/RoleFormData";
 import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
-import ServerResponse from "@/types/Action";
-import DashboardError, {
-	handleCatch,
-	unauthorized,
-} from "../../errors/DashboardError";
+import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
+import checkPermission from "@/modules/dashboard/services/checkPermission";
+import unauthorized from "@/modules/dashboard/utils/unauthorized";
+import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import handleCatch from "@/modules/dashboard/utils/handleCatch";
 
 /**
  * Upserts a role based on the provided RoleFormData.
@@ -21,7 +20,7 @@ import DashboardError, {
  */
 export default async function upsertRole(
 	data: RoleFormData
-): Promise<ServerResponse> {
+): Promise<ServerResponseAction> {
 	try {
 		const isInsert = !data.id;
 

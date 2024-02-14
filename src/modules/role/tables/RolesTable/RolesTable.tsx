@@ -1,26 +1,18 @@
 "use client";
-import { Table, Text, Flex, Button, Center } from "@mantine/core";
-import {
-	flexRender,
-	getCoreRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
+import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
+import { Text, Flex, Button } from "@mantine/core";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import React, { useState } from "react";
-import CrudPermissions from "@/features/auth/types/CrudPermissions";
-import getRoles from "@/features/dashboard/roles/data/getRoles";
-import createColumns from "./columns";
-import FormModal from "../../_modals/FormModal";
-import { ModalProps } from "../../_modals/FormModal/FormModal";
 import { TbPlus } from "react-icons/tb";
-import { RoleFormData } from "@/features/dashboard/roles/formSchemas/RoleFormData";
-import { string } from "zod";
-import { DeleteModal } from "../../_modals";
-import { DeleteModalProps } from "../../_modals/DeleteModal/DeleteModal";
-import { DashboardTable } from "@/features/dashboard/components";
+import getAllRoles from "../../actions/getAllRoles";
+import FormModal, { ModalProps } from "../../modals/FormModal";
+import DeleteModal, { DeleteModalProps } from "../../modals/DeleteModal";
+import createColumns from "./columns";
+import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	roles: Awaited<ReturnType<typeof getRoles>>;
+	roles: Awaited<ReturnType<typeof getAllRoles>>;
 }
 
 export default function RolesTable(props: Props) {
@@ -115,7 +107,7 @@ export default function RolesTable(props: Props) {
 					</Button>
 				)}
 			</Flex>
-			
+
 			<DashboardTable table={table} />
 
 			<FormModal {...modalProps} onClose={closeModal} />

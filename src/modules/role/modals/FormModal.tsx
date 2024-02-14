@@ -1,12 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import DashboardError from "@/features/dashboard/errors/DashboardError";
-import getAllPermissions from "@/features/dashboard/permissions/actions/getAllPermissions";
-import getRoleById from "@/features/dashboard/roles/actions/getRoleById";
-import upsertRole from "@/features/dashboard/roles/actions/upsertRole";
-import roleFormDataSchema, {
-	RoleFormData,
-} from "@/features/dashboard/roles/formSchemas/RoleFormData";
-import withErrorHandling from "@/features/dashboard/utils/withServerAction";
 import { showNotification } from "@/utils/notifications";
 import {
 	Flex,
@@ -28,6 +20,12 @@ import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
 import { string } from "zod";
+import roleFormDataSchema, { RoleFormData } from "../formSchemas/RoleFormData";
+import getAllPermissions from "@/modules/permission/actions/getAllPermissions";
+import withServerAction from "@/modules/dashboard/utils/withServerAction";
+import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import getRoleById from "../actions/getRoleById";
+import upsertRole from "../actions/upsertRole";
 
 export interface ModalProps {
 	title: string;
@@ -71,7 +69,7 @@ export default function FormModal(props: ModalProps) {
 	//Fetch Permissions
 	useEffect(() => {
 		setFetching(true);
-		withErrorHandling(getAllPermissions)
+		withServerAction(getAllPermissions)
 			.then((response) => {
 				setAllPermissions(response.data);
 			})
@@ -100,7 +98,7 @@ export default function FormModal(props: ModalProps) {
 		}
 
 		setFetching(true);
-		withErrorHandling(getRoleById, props.id)
+		withServerAction(getRoleById, props.id)
 			.then((response) => {
 				const data = response.data;
 				form.setValues({
@@ -137,7 +135,7 @@ export default function FormModal(props: ModalProps) {
 
 	const handleSubmit = (values: RoleFormData) => {
 		setSubmitting(true);
-		withErrorHandling(upsertRole, values)
+		withServerAction(upsertRole, values)
 			.then((response) => {
 				showNotification(response.message!, "success");
 				closeModal();
