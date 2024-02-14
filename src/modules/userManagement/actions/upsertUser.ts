@@ -3,12 +3,15 @@
 import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
-import userFormDataSchema, { UserFormData } from "../formSchemas/userFormSchema";
+import userFormDataSchema, {
+	UserFormData,
+} from "../formSchemas/userFormSchema";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
+import hashPassword from "@/modules/auth/utils/hashPassword";
 
 /**
  * Upserts a user based on the provided UserFormData.
@@ -34,32 +37,37 @@ export default async function upsertUser(
 		const validatedFields = userFormDataSchema.safeParse(data);
 		if (!validatedFields.success) {
 			throw new DashboardError({
-                errorCode: "INVALID_FORM_DATA",
-                formErrors: mapObjectToFirstValue(validatedFields.error.flatten().fieldErrors)
-            })
+				errorCode: "INVALID_FORM_DATA",
+				formErrors: mapObjectToFirstValue(
+					validatedFields.error.flatten().fieldErrors
+				),
+			});
 		}
 		const userData = {
-            id: validatedFields.data.id ? validatedFields.data.id : undefined,
+			id: validatedFields.data.id ? validatedFields.data.id : undefined,
 			name: validatedFields.data.name,
-            photoProfile: validatedFields.data.photoProfileUrl ?? "",
-            email: validatedFields.data.email
+			photoProfile: validatedFields.data.photoProfileUrl ?? "",
+			email: validatedFields.data.email,
 		};
+		const passwordHash = await hashPassword(validatedFields.data.password!);
 
 		// Database operation
 		if (isInsert) {
-            if (await prisma.user.findFirst({
-                where: {
-                    email: userData.email
-                }
-            })){
-                throw new DashboardError({
-                    errorCode: "INVALID_FORM_DATA",
-                    formErrors: {
-                        email: "The user is already exists"
-                    }
-                })
-            }
-			await prisma.user.create({ data: userData });
+			if (
+				await prisma.user.findFirst({
+					where: {
+						email: userData.email,
+					},
+				})
+			) {
+				throw new DashboardError({
+					errorCode: "INVALID_FORM_DATA",
+					formErrors: {
+						email: "The user is already exists",
+					},
+				});
+			}
+			await prisma.user.create({ data: { ...userData, passwordHash } });
 		} else {
 			await prisma.user.update({
 				where: { id: validatedFields.data.id! },
@@ -78,6 +86,6 @@ export default async function upsertUser(
 			}.`,
 		};
 	} catch (error) {
-		return handleCatch(error)
+		return handleCatch(error);
 	}
 }

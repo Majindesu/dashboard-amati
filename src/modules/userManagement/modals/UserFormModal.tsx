@@ -15,6 +15,7 @@ import {
 	Alert,
 	Center,
 	Avatar,
+	PasswordInput,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/navigation";
@@ -55,6 +56,7 @@ export default function UserFormModal(props: ModalProps) {
 			email: "",
 			name: "",
 			photoProfileUrl: "",
+			password: "",
 		},
 		validate: zodResolver(userFormDataSchema),
 		validateInputOnChange: false,
@@ -128,7 +130,7 @@ export default function UserFormModal(props: ModalProps) {
 			onClose={closeModal}
 			title={props.title}
 			scrollAreaComponent={ScrollArea.Autosize}
-			size="xl"
+			size="md"
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack mt="sm" gap="lg" px="lg">
@@ -137,7 +139,7 @@ export default function UserFormModal(props: ModalProps) {
 					<Skeleton visible={isFetching}>
 						<Center>
 							<Avatar
-								color={stringToColorHex(form.values.id)}
+								color={stringToColorHex(form.values.id ?? "")}
 								src={form.values.photoProfileUrl}
 								size={120}
 							>
@@ -177,6 +179,16 @@ export default function UserFormModal(props: ModalProps) {
 							{...form.getInputProps("email")}
 						/>
 					</Skeleton>
+
+					{/* Password */}
+					{!form.values.id && !isFetching && (
+						<PasswordInput
+							label="Password"
+							readOnly={props.readonly}
+							disabled={isSubmitting}
+							{...form.getInputProps("password")}
+						/>
+					)}
 
 					{/* Buttons */}
 					<Flex justify="flex-end" align="center" gap="lg" mt="lg">
