@@ -1,12 +1,14 @@
 "use server";
 
-import checkPermission from "@/features/auth/tools/checkPermission";
-import permissionFormDataSchema, { PermissionFormData } from "../../../../modules/permission/formSchemas/PermissionFormData";
+import permissionFormDataSchema, { PermissionFormData } from "../formSchemas/PermissionFormData";
 import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import prisma from "@/db";
 import { revalidatePath } from "next/cache";
-import ServerResponse from "@/types/Action";
-import DashboardError, { handleCatch, unauthorized } from "../../errors/DashboardError";
+import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
+import checkPermission from "@/modules/dashboard/services/checkPermission";
+import unauthorized from "@/modules/dashboard/utils/unauthorized";
+import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import handleCatch from "@/modules/dashboard/utils/handleCatch";
 
 /**
  * Upserts a permission based on the provided PermissionFormData.
@@ -18,14 +20,14 @@ import DashboardError, { handleCatch, unauthorized } from "../../errors/Dashboar
  */
 export default async function upsertPermission(
 	data: PermissionFormData
-): Promise<ServerResponse> {
+): Promise<ServerResponseAction> {
 	try {
 		const isInsert = !data.id;
 
 		// Authorization check
 		const permissionType = isInsert ? "permission.create" : "permission.update";
 		if (!(await checkPermission(permissionType))) {
-			return unauthorized();
+			unauthorized();
 		}
 
 		// Validate form data

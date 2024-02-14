@@ -1,11 +1,9 @@
+import checkMultiplePermissions from "@/modules/dashboard/services/checkMultiplePermissions";
+import getAllPermissions from "@/modules/permission/actions/getAllPermissions";
+import PermissionsTable from "@/modules/permission/tables/PermissionTable/PermissionTable";
 import { Card, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import React from "react";
-// import RolesTable from "./_tables/RolesTable/RolesTable";
-// import getRoles from "@/features/dashboard/roles/data/getRoles";
-import checkMultiplePermissions from "@/features/auth/tools/checkMultiplePermissions";
-import { PermissionTable } from "@/features/dashboard/permissions/tables";
-import getPermissions from "@/features/dashboard/permissions/data/getPermissions";
 
 interface Props {
 	searchParams: {
@@ -28,14 +26,15 @@ export default async function RolesPage({ searchParams }: Props) {
 		update: "permission.update",
 		delete: "permission.delete",
 	});
-    
-    const permissionData = await getPermissions()
+
+	const res = await getAllPermissions();
+	if (!res.success) throw new Error();
     
 	return (
 		<Stack>
 			<Title order={1}>Permissions</Title>
 			<Card>
-                <PermissionTable permissions={permissions} permissionData={permissionData} />
+                <PermissionsTable permissions={permissions} permissionData={res.data} />
 			</Card>
 		</Stack>
 	);
