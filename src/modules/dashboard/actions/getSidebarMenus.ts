@@ -25,7 +25,6 @@ export default async function getSidebarMenus(): Promise<
 		const permissions = await getUserPermissions();
 
 		for (let menu of sidebarMenus) {
-			console.log("aaa");
 			//if has children
 			if (menu.children) {
 				const currentMenuChildren: SidebarMenu["children"] = [];
@@ -52,10 +51,6 @@ export default async function getSidebarMenus(): Promise<
 			}
 			//if does not have any children
 			else {
-				// console.table({
-				// 	allowedPermissions: menu.allowedPermissions,
-				// 	userPermissions: permissions
-				// })
 				if (
 					menu.allowedPermissions?.some((perm) =>
 						permissions?.includes(perm)
@@ -68,9 +63,6 @@ export default async function getSidebarMenus(): Promise<
 				}
 			}
 		}
-
-		console.log("permissions", permissions);
-		console.log("menus", filteredMenus);
 
 		return {
 			success: true,
