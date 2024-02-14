@@ -1,7 +1,5 @@
 "use client";
-
-import getUser from "@/features/auth/actions/getUser";
-import signIn from "@/features/auth/actions/signIn";
+import signIn from "@/modules/auth/actions/signIn";
 import {
 	Paper,
 	PasswordInput,
@@ -40,7 +38,7 @@ export default function LoginPage() {
 								variant="filled"
 								color="pink"
 								title=""
-							// icon={icon}
+								// icon={icon}
 							>
 								{state.errors.message}
 							</Alert>

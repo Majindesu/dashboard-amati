@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,39 +8,39 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(cuid())
+  id                String             @id @default(cuid())
   name              String?
-  email             String?   @unique
+  email             String?            @unique
   emailVerified     DateTime?
   passwordHash      String?
   photoProfile      UserPhotoProfiles?
-  roles             Role[]
-  directPermissions Permission[]
+  directPermissions Permission[]       @relation("PermissionToUser")
+  roles             Role[]             @relation("RoleToUser")
 }
 
 model UserPhotoProfiles {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  path          String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  path   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Role {
-  id            String    @id @default(cuid())
-  code          String    @unique
-  name          String
-  description   String    @default("")
-  isActive      Boolean   @default(false)
-  users         User[]
-  permissions   Permission[]
+  id          String       @id @default(cuid())
+  code        String       @unique
+  name        String
+  description String       @default("")
+  isActive    Boolean      @default(false)
+  permissions Permission[] @relation("PermissionToRole")
+  users       User[]       @relation("RoleToUser")
 }
 
 model Permission {
-  id            String    @id @default(cuid())
-  code          String    @unique
-  name          String
-  description   String    @default("")
-  isActive      Boolean    @default(false)
-  roles         Role[]
-  directUsers   User[]
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        String
+  description String  @default("")
+  isActive    Boolean @default(false)
+  roles       Role[]  @relation("PermissionToRole")
+  directUsers User[]  @relation("PermissionToUser")
 }

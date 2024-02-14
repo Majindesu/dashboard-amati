@@ -1,6 +1,5 @@
+import guestOnly from "@/modules/auth/actions/guestOnly";
 import React from "react";
-
-import guestOnly from "@/features/auth/actions/guestOnly";
 
 interface Props {
 	children: React.ReactNode;

@@ -1,4 +1,4 @@
-import hashPassword from "../../src/features/auth/tools/hashPassword";
+import hashPassword from "../../src/modules/auth/utils/hashPassword";
 import { User, PrismaClient, Prisma } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { log } from "console";

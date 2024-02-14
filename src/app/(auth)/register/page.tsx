@@ -1,6 +1,6 @@
 "use client";
 
-import createUser from "@/features/auth/actions/createUser";
+import createUser from "@/modules/auth/actions/createUser";
 import {
 	Paper,
 	PasswordInput,
@@ -9,63 +9,69 @@ import {
 	TextInput,
 	Group,
 	Anchor,
-    Button,
+	Button,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useEffect, useState } from "react";
 
 export interface RegisterFormSchema {
-	email: string,
-	password: string,
-    passwordConfirmation: string,
-    name: string,
+	email: string;
+	password: string;
+	passwordConfirmation: string;
+	name: string;
 }
 
 export default function RegisterPage() {
-
-	const [errorMessage, setErrorMessage] = useState("")
+	const [errorMessage, setErrorMessage] = useState("");
 
 	const form = useForm<RegisterFormSchema>({
 		initialValues: {
 			email: "",
 			password: "",
-            passwordConfirmation: "",
-            name: ""
+			passwordConfirmation: "",
+			name: "",
 		},
-        validate: {
-            email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-            password: (value: string) => (value.length >= 6 ? null : 'Password should be at least 6 characters'),
-            passwordConfirmation: (value: string, values: RegisterFormSchema) => value === values.password ? null : 'Passwords should match',
-            name: (value: string) => (value.length > 0 ? null : 'Name is required'),
-        }
+		validate: {
+			email: (value: string) =>
+				/^\S+@\S+$/.test(value) ? null : "Invalid email",
+			password: (value: string) =>
+				value.length >= 6
+					? null
+					: "Password should be at least 6 characters",
+			passwordConfirmation: (value: string, values: RegisterFormSchema) =>
+				value === values.password ? null : "Passwords should match",
+			name: (value: string) =>
+				value.length > 0 ? null : "Name is required",
+		},
 	});
 
 	const handleSubmit = async (values: RegisterFormSchema) => {
 		const formData = new FormData();
-		Object.entries(values)
-			.forEach(([key, value]) => {
-				formData.append(key, value)
-			});
+		Object.entries(values).forEach(([key, value]) => {
+			formData.append(key, value);
+		});
 
 		const response = await createUser(formData);
 
-		if (!response.success){
+		if (!response.success) {
 			setErrorMessage(response.error.message);
 
-			if (response.error.errors){
-				const errors = Object.entries(response.error.errors)
-					.reduce((prev, [k,v]) => {
-						prev[k] = v[0]
+			if (response.error.errors) {
+				const errors = Object.entries(response.error.errors).reduce(
+					(prev, [k, v]) => {
+						prev[k] = v[0];
 						return prev;
-					}, {} as {[k: string]: string})
+					},
+					{} as { [k: string]: string }
+				);
 
-				form.setErrors(errors)
-				console.log(form.errors)
+				form.setErrors(errors);
+				console.log(form.errors);
 			} else {
-				form.clearErrors()
+				form.clearErrors();
 			}
 		}
-	}
+	};
 
 	return (
 		<div className="w-screen h-screen flex items-center justify-center">
@@ -73,9 +79,11 @@ export default function RegisterPage() {
 				<Text size="lg" fw={500} mb={30}>
 					Register
 				</Text>
-				<form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+				<form
+					onSubmit={form.onSubmit((values) => handleSubmit(values))}
+				>
 					<Stack>
-                        <TextInput
+						<TextInput
 							label="Name"
 							placeholder="Enter your name"
 							name="name"
@@ -96,7 +104,7 @@ export default function RegisterPage() {
 							autoComplete="new-password"
 							{...form.getInputProps("password")}
 						/>
-                        <PasswordInput
+						<PasswordInput
 							label="Repeat Password"
 							placeholder="Repeat yout password"
 							name="passwordConfirmation"
@@ -112,14 +120,14 @@ export default function RegisterPage() {
 							c="dimmed"
 							// onClick={() => toggle()}
 							size="xs"
-                            href="/login"
+							href="/login"
 						>
 							Already have an account? Login
 						</Anchor>
 
-                        <Button type="submit" radius="xl">
-                            Register
-                        </Button>
+						<Button type="submit" radius="xl">
+							Register
+						</Button>
 					</Group>
 				</form>
 			</Paper>
