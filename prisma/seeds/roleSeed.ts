@@ -11,6 +11,12 @@ export default async function roleSeed(prisma: PrismaClient) {
             description: "Has full access to the system and can manage all features and settings",
             isActive: true,
             name: "Super Admin"
+        },
+        {
+            code: "reseller-office-365",
+            description: "Has ability to make request Office 365 links",
+            isActive: true,
+            name: "Reseller Office 365"
         }
     ];
 
