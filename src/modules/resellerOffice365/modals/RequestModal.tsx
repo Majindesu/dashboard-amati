@@ -40,7 +40,6 @@ interface FormType {
 }
 
 export default function RequestModal(props: ModalProps) {
-	const [isSubmitting, setSubmitting] = useState(false);
 	const [formState, setFormState] = useState<
 		"idle" | "submitting" | "waiting"
 	>("idle");
