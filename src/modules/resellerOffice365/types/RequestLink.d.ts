@@ -1,6 +1,6 @@
 export default interface RequestLink {
     id: string;
-	requestDate: Date,
+	requestDate: string,
     userCount: number,
     status: string
 }

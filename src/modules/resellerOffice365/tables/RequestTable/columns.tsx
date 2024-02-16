@@ -6,7 +6,7 @@ import createActionButtons from "@/modules/dashboard/utils/createActionButton";
 
 export interface RequestLinkRow {
 	id: string;
-	requestDate: Date,
+	requestDate: string,
     userCount: number,
     status: string
 }
@@ -32,6 +32,10 @@ const createColumns = (options: ColumnOptions) => {
 
 		columnHelper.accessor("requestDate", {
 			header: "Request Date",
+			cell: (props) => {
+				const date = new Date(props.row.original.requestDate);
+				return `${date.toDateString()}; ${date.toLocaleTimeString()}`
+			}
 		}),
 
 		columnHelper.accessor("userCount", {

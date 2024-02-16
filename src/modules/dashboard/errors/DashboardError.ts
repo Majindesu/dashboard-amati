@@ -7,6 +7,7 @@ export const DashboardErrorCodes = [
 	"INVALID_JWT_TOKEN",
 	"JWT_SECRET_EMPTY",
 	"USER_ALREADY_EXISTS",
+	"INVALID_FORM_DATA"
 ] as const;
 
 interface DashboardErrorOptions {

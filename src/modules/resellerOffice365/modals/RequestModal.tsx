@@ -1,4 +1,5 @@
 import {
+	Alert,
 	Button,
 	Divider,
 	Fieldset,
@@ -10,8 +11,10 @@ import {
 	Select,
 	Stack,
 	TextInput,
+	Loader,
+	Text,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { useForm, zodResolver } from "@mantine/form";
 import React, { useState } from "react";
 import {
 	TbAt,
@@ -22,6 +25,11 @@ import {
 	TbUsers,
 } from "react-icons/tb";
 import resellerOffice365Config from "../config";
+import requestLinkFormSchema from "../formSchemas/requestLinkFormSchema";
+import withServerAction from "@/modules/dashboard/utils/withServerAction";
+import createLinkRequest from "../actions/createLinkRequest";
+import { notifications } from "@mantine/notifications";
+import DashboardError from "@/modules/dashboard/errors/DashboardError";
 
 export interface ModalProps {
 	title: string;
@@ -30,25 +38,18 @@ export interface ModalProps {
 	onClose?: () => void;
 }
 
-interface FormType {
-	numberOfLinks: number;
-	details: {
-		email: string;
-		activePeriod: (typeof resellerOffice365Config.activePeriods)[number];
-		endUserQty: number;
-	}[];
-}
-
 export default function RequestModal(props: ModalProps) {
 	const [formState, setFormState] = useState<
 		"idle" | "submitting" | "waiting"
 	>("idle");
 
+	const [errorMessage, setErrorMessage] = useState("");
+
 	const closeModal = () => {
 		props.onClose ? props.onClose() : "";
 	};
 
-	const form = useForm<FormType>({
+	const form = useForm<RequestLinkForm>({
 		initialValues: {
 			numberOfLinks: 1,
 			details: [
@@ -59,6 +60,7 @@ export default function RequestModal(props: ModalProps) {
 				},
 			],
 		},
+		validate: zodResolver(requestLinkFormSchema),
 		onValuesChange: (values, prev) => {
 			// Check if numberOfLinks has changed
 			if (values.numberOfLinks !== prev.numberOfLinks) {
@@ -90,24 +92,60 @@ export default function RequestModal(props: ModalProps) {
 
 	const disableChange = formState !== "idle";
 
-	const handleSubmit = (values: FormType) => {
+	const handleSubmit = (values: RequestLinkForm) => {
 		const submitableState = ["idle"];
 
 		if (!submitableState.includes(formState)) return; //prevent submit
 
 		setFormState("submitting");
+
+		withServerAction(createLinkRequest, values)
+			.then((response) => {
+				notifications.show({
+					message: response.message,
+					color: "green",
+				});
+				setFormState("waiting");
+			})
+			.catch((e) => {
+				if (e instanceof DashboardError) {
+					if (e.errorCode === "INVALID_FORM_DATA") {
+						if (e.formErrors) {
+							form.setErrors(e.formErrors);
+						} else {
+							setErrorMessage(e.message);
+						}
+					} else {
+						setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
+					}
+				} else if (e instanceof Error) {
+					setErrorMessage(`ERROR: ${e.message}`);
+				} else {
+					setErrorMessage(
+						`Unkown error is occured. Please contact administrator`
+					);
+				}
+
+				setFormState("idle");
+			});
 	};
 
 	return (
 		<Modal
 			size="sm"
 			opened={props.opened}
-			title={props.title}
+			title={formState === "waiting" ? "Link Request Detail" : "Create New Request"}
 			onClose={closeModal}
 			scrollAreaComponent={ScrollArea.Autosize}
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack gap="md">
+					{formState === "waiting" && (
+						<Alert color="orange">
+							Your request is being processed by administrator
+						</Alert>
+					)}
+
 					<NumberInput
 						label="Please input the number of links you request"
 						min={1}
@@ -178,9 +216,10 @@ export default function RequestModal(props: ModalProps) {
 								variant="filled"
 								leftSection={<TbDeviceFloppy size={20} />}
 								type="submit"
-								loading={["submitting", "waiting"].includes(
+								disabled={["submitting", "waiting"].includes(
 									formState
 								)}
+								loading={["submitting"].includes(formState)}
 							>
 								Make Request
 							</Button>
