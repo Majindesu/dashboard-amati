@@ -26,7 +26,7 @@ export default async function RolesPage({ searchParams }: Props) {
 		update: "permission.update",
 		delete: "permission.delete",
 	});
-
+	
 	const res = await getAllPermissions();
 	if (!res.success) throw new Error("Error while fetch permission");
     

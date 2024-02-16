@@ -12,7 +12,7 @@ import prisma from "@/core/db";
  * @returns The user's data if the user exists, or null if no user is found.
  * Throws an error if the token is invalid or the database query fails.
  */
-const getUserFromToken = cache(async (token: string) => {
+const getUserFromToken = async (token: string) => {
 	// Decode the JWT token to extract the user ID
 	const decodedToken = decodeJwtToken(token) as { id: string; iat: number };
 
@@ -32,6 +32,6 @@ const getUserFromToken = cache(async (token: string) => {
 	});
 
 	return user;
-});
+};
 
 export default getUserFromToken;
