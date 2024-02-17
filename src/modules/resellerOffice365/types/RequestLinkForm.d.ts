@@ -1,4 +1,5 @@
 interface RequestLinkForm {
+	id: string | undefined;
 	numberOfLinks: number;
 	details: {
 		email: string;

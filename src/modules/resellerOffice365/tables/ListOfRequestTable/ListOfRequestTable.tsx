@@ -8,21 +8,23 @@ import createColumns from "./columns";
 import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
 import RequestLink from "../../types/RequestLink";
 import RequestModal, { ModalProps } from "../../modals/RequestModal";
+import RequestLinkWithIssuerData from "../../types/RequestLinkWithIssuerData";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	tableData: RequestLink[];
+	tableData: RequestLinkWithIssuerData[];
 }
 
 const defaultModalProps: ModalProps = {
 	opened: false,
-	title: "",
+	title: "Create new Link",
 	type: "create",
 	detailId: null,
 };
 
-export default function RequestTable(props: Props) {
+export default function ListOfRequestTable(props: Props) {
 	const [modalProps, setModalProps] = useState<ModalProps>(defaultModalProps);
+	// const [openModal, setOpenModal] = useState(false);
 
 	const table = useReactTable({
 		data: props.tableData,
@@ -30,22 +32,23 @@ export default function RequestTable(props: Props) {
 			permissions: props.permissions,
 			actions: {
 				detail: (id) => {
-					console.log(id);
+					openFormModal(id);
 				},
 			},
 		}),
+
 		getCoreRowModel: getCoreRowModel(),
 		defaultColumn: {
 			cell: (props) => <Text>{props.getValue() as ReactNode}</Text>,
 		},
 	});
 
-	const openCreateModal = () => {
+	const openFormModal = (id: string) => {
 		setModalProps({
 			opened: true,
-			title: "Create New Office 365 Link Request",
-			detailId: null,
-			type: "create",
+			title: "Request Detail",
+			type: "input link",
+			detailId: id,
 		});
 	};
 
@@ -55,14 +58,6 @@ export default function RequestTable(props: Props) {
 
 	return (
 		<>
-			<Flex justify="flex-end">
-				{
-					<Button leftSection={<TbPlus />} onClick={openCreateModal}>
-						New Link Request
-					</Button>
-				}
-			</Flex>
-
 			<DashboardTable table={table} />
 
 			<RequestModal {...modalProps} onClose={closeModal} />

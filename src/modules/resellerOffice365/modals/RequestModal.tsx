@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
 	Alert,
 	Button,
@@ -13,9 +14,10 @@ import {
 	TextInput,
 	Loader,
 	Text,
+	Skeleton,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	TbAt,
 	TbCalendarTime,
@@ -30,27 +32,82 @@ import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import createLinkRequest from "../actions/createLinkRequest";
 import { notifications } from "@mantine/notifications";
 import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import getLinkRequestDataById from "../actions/getLinkRequestDataById";
+import { isPagesAPIRouteMatch } from "next/dist/server/future/route-matches/pages-api-route-match";
 
 export interface ModalProps {
 	title: string;
 	opened: boolean;
-	readonly: boolean;
 	onClose?: () => void;
+	type: "create" | "detail" | "waiting" | "input link";
+	detailId: string | null;
 }
 
 export default function RequestModal(props: ModalProps) {
 	const [formState, setFormState] = useState<
-		"idle" | "submitting" | "waiting"
+		"idle" | "submitting" | "waiting" | "fetching" | "error"
 	>("idle");
 
 	const [errorMessage, setErrorMessage] = useState("");
 
 	const closeModal = () => {
+		if (formState === "submitting") return; //prevents closing
+		//reset state
+		setErrorMessage("");
+		setFormState("idle");
+		form.reset();
 		props.onClose ? props.onClose() : "";
 	};
 
+	useEffect(() => {
+		const fetchDataById = async (id: string) => {
+			const { data } = await withServerAction(getLinkRequestDataById, id);
+			if (!props.opened) return;
+			return data;
+		};
+
+		switch (props.type) {
+			case "input link": {
+				if (!props.detailId || !props.opened) return;
+				setFormState("fetching");
+				fetchDataById(props.detailId)
+					.then((data) => {
+						if (!data) {
+							closeModal();
+							notifications.show({
+								message:
+									"The returned data from server is empty. Please try again",
+								color: "red",
+							});
+							return;
+						}
+						form.setValues({
+							numberOfLinks: data.links.length,
+							id: data.id,
+							details: data.links.map((item) => ({
+								activePeriod: item.activePeriod,
+								email: item.email,
+								endUserQty: item.numberOfUsers,
+							})),
+						});
+					})
+					.catch((e) => {
+						if (e instanceof Error) {
+							setErrorMessage(e.message);
+						} else {
+							setErrorMessage("Unkown error occured");
+						}
+					})
+					.finally(() => {
+						setFormState("idle");
+					});
+			}
+		}
+	}, [props]);
+
 	const form = useForm<RequestLinkForm>({
 		initialValues: {
+			id: undefined,
 			numberOfLinks: 1,
 			details: [
 				{
@@ -90,51 +147,67 @@ export default function RequestModal(props: ModalProps) {
 		},
 	});
 
-	const disableChange = formState !== "idle";
-
 	const handleSubmit = (values: RequestLinkForm) => {
-		const submitableState = ["idle"];
+		const submitableState: (typeof formState)[] = ["idle"];
 
-		if (!submitableState.includes(formState)) return; //prevent submit
+		if (!submitableState.includes(formState)) return; //prevent submit when not in subitable state
 
 		setFormState("submitting");
 
-		withServerAction(createLinkRequest, values)
-			.then((response) => {
-				notifications.show({
-					message: response.message,
-					color: "green",
-				});
-				setFormState("waiting");
-			})
-			.catch((e) => {
-				if (e instanceof DashboardError) {
-					if (e.errorCode === "INVALID_FORM_DATA") {
-						if (e.formErrors) {
-							form.setErrors(e.formErrors);
+		switch (props.type) {
+			case "create": {
+				withServerAction(createLinkRequest, values)
+					.then((response) => {
+						notifications.show({
+							message: response.message,
+							color: "green",
+						});
+						setFormState("waiting");
+					})
+					.catch((e) => {
+						if (e instanceof DashboardError) {
+							if (e.errorCode === "INVALID_FORM_DATA") {
+								if (e.formErrors) {
+									form.setErrors(e.formErrors);
+								} else {
+									setErrorMessage(e.message);
+								}
+							} else {
+								setErrorMessage(
+									`ERROR: ${e.message} (${e.errorCode})`
+								);
+							}
+						} else if (e instanceof Error) {
+							setErrorMessage(`ERROR: ${e.message}`);
 						} else {
-							setErrorMessage(e.message);
+							setErrorMessage(
+								`Unkown error is occured. Please contact administrator`
+							);
 						}
-					} else {
-						setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
-					}
-				} else if (e instanceof Error) {
-					setErrorMessage(`ERROR: ${e.message}`);
-				} else {
-					setErrorMessage(
-						`Unkown error is occured. Please contact administrator`
-					);
-				}
 
-				setFormState("idle");
-			});
+						setFormState("idle");
+					});
+				break;
+			}
+			case "input link": {
+				//TODO: Handle add link
+			}
+		}
 	};
+
+	const disableChange = formState !== "idle";
+	const readonly = props.type === "input link";
+	const showSkeleton = formState === "fetching";
 
 	return (
 		<Modal
 			size="sm"
 			opened={props.opened}
-			title={formState === "waiting" ? "Link Request Detail" : "Create New Request"}
+			title={
+				formState === "waiting"
+					? "Link Request Detail"
+					: "Create New Request"
+			}
 			onClose={closeModal}
 			scrollAreaComponent={ScrollArea.Autosize}
 		>
@@ -146,16 +219,21 @@ export default function RequestModal(props: ModalProps) {
 						</Alert>
 					)}
 
-					<NumberInput
-						label="Please input the number of links you request"
-						min={1}
-						max={3}
-						allowDecimal={false}
-						clampBehavior="strict"
-						leftSection={<TbLink />}
-						disabled={disableChange}
-						{...form.getInputProps("numberOfLinks")}
-					/>
+					{errorMessage && <Alert color="red">{errorMessage}</Alert>}
+
+					<Skeleton visible={showSkeleton}>
+						<NumberInput
+							label="Please input the number of links you request"
+							min={1}
+							max={3}
+							allowDecimal={false}
+							clampBehavior="strict"
+							leftSection={<TbLink />}
+							disabled={disableChange}
+							readOnly={readonly}
+							{...form.getInputProps("numberOfLinks")}
+						/>
+					</Skeleton>
 
 					<Divider
 						label="End User Information"
@@ -165,39 +243,60 @@ export default function RequestModal(props: ModalProps) {
 					<Stack>
 						{form.values.details.map((item, i) => (
 							<Fieldset key={i} legend={`Information ${i + 1}`}>
-								<TextInput
-									leftSection={<TbAt />}
-									label="Email"
-									disabled={disableChange}
-									{...form.getInputProps(
-										`details.${i}.email`
+								<Stack gap="xs">
+									<Skeleton visible={showSkeleton}>
+										<TextInput
+											leftSection={<TbAt />}
+											label="Email"
+											readOnly={readonly}
+											disabled={disableChange}
+											{...form.getInputProps(
+												`details.${i}.email`
+											)}
+										/>
+									</Skeleton>
+									<Flex gap="md">
+										<Skeleton visible={showSkeleton}>
+											<Select
+												data={
+													resellerOffice365Config.activePeriods
+												}
+												label="Active Period"
+												disabled={disableChange}
+												readOnly={readonly}
+												leftSection={<TbCalendarTime />}
+												{...form.getInputProps(
+													`details.${i}.activePeriod`
+												)}
+											/>
+										</Skeleton>
+										<Skeleton visible={showSkeleton}>
+											<NumberInput
+												label="End User Quantity"
+												leftSection={<TbUsers />}
+												min={1}
+												max={5}
+												disabled={disableChange}
+												allowDecimal={false}
+												readOnly={readonly}
+												clampBehavior="strict"
+												{...form.getInputProps(
+													`details.${i}.endUserQty`
+												)}
+											/>
+										</Skeleton>
+									</Flex>
+									{["input link", "detail"].includes(
+										props.type
+									) && (
+										<Skeleton visible={showSkeleton}>
+											<TextInput
+												label="Activation Link"
+												required
+											/>
+										</Skeleton>
 									)}
-								/>
-								<Flex gap="md">
-									<Select
-										data={
-											resellerOffice365Config.activePeriods
-										}
-										label="Active Period"
-										disabled={disableChange}
-										leftSection={<TbCalendarTime />}
-										{...form.getInputProps(
-											`details.${i}.activePeriod`
-										)}
-									/>
-									<NumberInput
-										label="End User Quantity"
-										leftSection={<TbUsers />}
-										min={1}
-										max={5}
-										disabled={disableChange}
-										allowDecimal={false}
-										clampBehavior="strict"
-										{...form.getInputProps(
-											`details.${i}.endUserQty`
-										)}
-									/>
-								</Flex>
+								</Stack>
 							</Fieldset>
 						))}
 					</Stack>
@@ -211,7 +310,7 @@ export default function RequestModal(props: ModalProps) {
 						>
 							Close
 						</Button>
-						{(!props.readonly || formState === "waiting") && (
+						{formState === "waiting" && (
 							<Button
 								variant="filled"
 								leftSection={<TbDeviceFloppy size={20} />}

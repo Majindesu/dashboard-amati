@@ -10,7 +10,6 @@ import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import db from "@/core/db";
 import getCurrentUser from "@/modules/auth/utils/getCurrentUser";
 import { revalidatePath } from "next/cache";
-import {server} from "../../../../server/socket";
 
 export default async function createLinkRequest(
 	formData: RequestLinkForm
@@ -54,8 +53,6 @@ export default async function createLinkRequest(
 		});
 
         revalidatePath(".")
-
-		server.publish(`mwrl-${currentUser.id}`, "update")
 
 		return {
 			success: true,

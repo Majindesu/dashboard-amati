@@ -1,15 +1,9 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { Badge, Flex } from "@mantine/core";
+import { Avatar, Badge, Flex, Stack, Text } from "@mantine/core";
 import { TbEye, TbPencil, TbTrash } from "react-icons/tb";
 import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
 import createActionButtons from "@/modules/dashboard/utils/createActionButton";
-
-export interface RequestLinkRow {
-	id: string;
-	requestDate: string;
-	userCount: number;
-	status: string;
-}
+import RequestLinkWithIssuerData from "../../types/RequestLinkWithIssuerData";
 
 interface ColumnOptions {
 	permissions: Partial<CrudPermissions>;
@@ -21,7 +15,7 @@ interface ColumnOptions {
 }
 
 const createColumns = (options: ColumnOptions) => {
-	const columnHelper = createColumnHelper<RequestLinkRow>();
+	const columnHelper = createColumnHelper<RequestLinkWithIssuerData>();
 
 	const columns = [
 		columnHelper.accessor("id", {
@@ -30,13 +24,26 @@ const createColumns = (options: ColumnOptions) => {
 			cell: (props) => props.row.index + 1,
 		}),
 
-		columnHelper.accessor("requestDate", {
+		columnHelper.accessor("requestedAt", {
 			header: "Request Date",
 			cell: (props) => {
-				const date = new Date(props.row.original.requestDate);
+				const date = new Date(props.row.original.requestedAt);
 				return `${date.toDateString()}; ${date.toLocaleTimeString()}`;
 			},
 		}),
+
+        columnHelper.accessor("creator", {
+            header: "Issuer",
+            cell: (props) => {
+                return (<Flex gap="sm" align="center">
+                    <Avatar src={props.cell.getValue().photoProfile} />
+                    <div>
+                        <Text>{props.cell.getValue().name}</Text>
+                        <Text size="xs" c="gray">{props.cell.getValue().email}</Text>
+                    </div>
+                </Flex>)
+            }
+        }),
 
 		columnHelper.accessor("userCount", {
 			header: "User Count",
@@ -75,14 +82,6 @@ const createColumns = (options: ColumnOptions) => {
 								options.actions.detail(props.row.original.id),
 							color: "green",
 							icon: <TbEye />,
-						},
-						{
-							label: "Edit",
-							permission: options.permissions.update,
-							// action: () =>
-							// 	options.actions.edit(props.row.original.id),
-							color: "yellow",
-							icon: <TbPencil />,
 						},
 					])}
 				</Flex>

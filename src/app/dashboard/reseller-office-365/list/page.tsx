@@ -1,7 +1,9 @@
 import getUserRoles from "@/modules/auth/utils/getUserRoles";
 import checkMultiplePermissions from "@/modules/dashboard/services/checkMultiplePermissions";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
+import getAllLinkRequests from "@/modules/resellerOffice365/actions/getAllLinkRequests";
 import getLinkRequests from "@/modules/resellerOffice365/actions/getLinkRequests";
+import ListOfRequestTable from "@/modules/resellerOffice365/tables/ListOfRequestTable/ListOfRequestTable";
 import RequestTable from "@/modules/resellerOffice365/tables/RequestTable/RequestTable";
 import { Card, Stack, Title } from "@mantine/core";
 import { notFound } from "next/navigation";
@@ -18,19 +20,19 @@ export default async function RequestLinkPage() {
 
 	if (!permissions.readAll) notFound();
 
-	const data = await getLinkRequests()
-	if (!data.success){
+	const data = await getAllLinkRequests();
+	if (!data.success) {
 		//todo: handle error
-		console.error(data.error)
-		throw new Error("Error while fetch data")
+		console.error(data.error);
+		throw new Error("Error while fetch data");
 	}
-	const tableData = data.data
+	const tableData = data.data;
 
 	return (
 		<Stack>
-			<Title order={1}>Permohonan Link Office 365</Title>
+			<Title order={1}>List Link Office 365</Title>
 			<Card>
-				<RequestTable permissions={permissions} tableData={tableData} />
+				<ListOfRequestTable permissions={permissions} tableData={tableData} />
 			</Card>
 		</Stack>
 	);

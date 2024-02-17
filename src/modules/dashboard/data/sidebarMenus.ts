@@ -31,13 +31,13 @@ const sidebarMenus: SidebarMenu[] = [
 		allowedPermissions: ["*"],
 		children: [
 			{
-				label: "Request Link",
+				label: "My Request Links",
 				link: "/reseller-office-365/request",
 				allowedRoles: ["*"]
 			},
 			{
-				label: "Respond Request Link",
-				link: "#",
+				label: "Process Request Link",
+				link: "/reseller-office-365/list",
 				allowedRoles: ["*"]
 			}
 		]
