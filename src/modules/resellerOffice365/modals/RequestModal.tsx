@@ -67,6 +67,7 @@ export default function RequestModal(props: ModalProps) {
 		};
 
 		switch (props.type) {
+			case "detail":
 			case "input link": {
 				if (!props.detailId || !props.opened) return;
 				setFormState("fetching");
@@ -101,6 +102,7 @@ export default function RequestModal(props: ModalProps) {
 					.finally(() => {
 						setFormState("idle");
 					});
+				break;
 			}
 		}
 	}, [props]);
@@ -196,8 +198,10 @@ export default function RequestModal(props: ModalProps) {
 	};
 
 	const disableChange = formState !== "idle";
-	const readonly = props.type === "input link";
+	const readonly = ["input link", "detail"].includes(props.type)
 	const showSkeleton = formState === "fetching";
+	const showActivationLink = ["input link", "detail"].includes(props.type)
+	const enableInputActivationLink = props.type === "input link"
 
 	return (
 		<Modal
@@ -286,13 +290,14 @@ export default function RequestModal(props: ModalProps) {
 											/>
 										</Skeleton>
 									</Flex>
-									{["input link", "detail"].includes(
-										props.type
-									) && (
+									{showActivationLink && (
 										<Skeleton visible={showSkeleton}>
 											<TextInput
 												label="Activation Link"
 												required
+												disabled={disableChange}
+												readOnly={!enableInputActivationLink}
+												placeholder={enableInputActivationLink ? "Enter link here" : "No link provided"}
 											/>
 										</Skeleton>
 									)}

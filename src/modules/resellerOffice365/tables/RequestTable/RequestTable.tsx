@@ -30,7 +30,7 @@ export default function RequestTable(props: Props) {
 			permissions: props.permissions,
 			actions: {
 				detail: (id) => {
-					console.log(id);
+					openDetailModal(id);
 				},
 			},
 		}),
@@ -46,6 +46,15 @@ export default function RequestTable(props: Props) {
 			title: "Create New Office 365 Link Request",
 			detailId: null,
 			type: "create",
+		});
+	};
+
+	const openDetailModal = (id: string) => {
+		setModalProps({
+			opened: true,
+			title: "Office 365 Link Request Detail",
+			detailId: id,
+			type: "detail",
 		});
 	};
 
