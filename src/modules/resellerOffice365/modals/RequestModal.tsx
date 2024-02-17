@@ -34,6 +34,7 @@ import { notifications } from "@mantine/notifications";
 import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import getLinkRequestDataById from "../actions/getLinkRequestDataById";
 import { isPagesAPIRouteMatch } from "next/dist/server/future/route-matches/pages-api-route-match";
+import inputLink from "../actions/inputLinks";
 
 export interface ModalProps {
 	title: string;
@@ -89,6 +90,8 @@ export default function RequestModal(props: ModalProps) {
 								activePeriod: item.activePeriod,
 								email: item.email,
 								endUserQty: item.numberOfUsers,
+								id: item.id,
+								link: item.link ?? "",
 							})),
 						});
 					})
@@ -116,6 +119,7 @@ export default function RequestModal(props: ModalProps) {
 					email: "",
 					activePeriod: "2 Years",
 					endUserQty: 1,
+					link: "",
 				},
 			],
 		},
@@ -132,6 +136,7 @@ export default function RequestModal(props: ModalProps) {
 						email: "",
 						activePeriod: "2 Years",
 						endUserQty: 1,
+						link: "",
 					});
 				}
 
@@ -154,10 +159,9 @@ export default function RequestModal(props: ModalProps) {
 
 		if (!submitableState.includes(formState)) return; //prevent submit when not in subitable state
 
-		setFormState("submitting");
-
 		switch (props.type) {
 			case "create": {
+				setFormState("submitting");
 				withServerAction(createLinkRequest, values)
 					.then((response) => {
 						notifications.show({
@@ -192,16 +196,43 @@ export default function RequestModal(props: ModalProps) {
 				break;
 			}
 			case "input link": {
-				//TODO: Handle add link
+				if (!props.detailId) return;
+				setFormState("submitting");
+				withServerAction(inputLink, {
+					id: props.detailId,
+					data: form.values.details.map((item) => ({
+						link: item.link,
+						linkId: item.id ?? "",
+					})),
+				})
+					.then(() => {
+						setFormState("idle");
+						notifications.show({
+							message: "Data has been updated",
+							color: "green",
+						});
+						closeModal();
+					})
+					.catch((e) => {
+						if (e instanceof Error) {
+							setErrorMessage(e.message);
+						} else {
+							setErrorMessage("An unkown error occured");
+						}
+					})
+					.finally(() => {
+						setFormState("idle");
+					});
 			}
 		}
 	};
 
 	const disableChange = formState !== "idle";
-	const readonly = ["input link", "detail"].includes(props.type)
+	const readonly = ["input link", "detail"].includes(props.type);
 	const showSkeleton = formState === "fetching";
-	const showActivationLink = ["input link", "detail"].includes(props.type)
-	const enableInputActivationLink = props.type === "input link"
+	const showActivationLink = ["input link", "detail"].includes(props.type);
+	const enableInputActivationLink = props.type === "input link";
+	const showSubmitButton = ["create", "input link"].includes(props.type);
 
 	return (
 		<Modal
@@ -294,10 +325,21 @@ export default function RequestModal(props: ModalProps) {
 										<Skeleton visible={showSkeleton}>
 											<TextInput
 												label="Activation Link"
-												required
+												required={
+													enableInputActivationLink
+												}
 												disabled={disableChange}
-												readOnly={!enableInputActivationLink}
-												placeholder={enableInputActivationLink ? "Enter link here" : "No link provided"}
+												readOnly={
+													!enableInputActivationLink
+												}
+												{...form.getInputProps(
+													`details.${i}.link`
+												)}
+												placeholder={
+													enableInputActivationLink
+														? "Enter link here"
+														: "No link provided"
+												}
 											/>
 										</Skeleton>
 									)}
@@ -315,7 +357,7 @@ export default function RequestModal(props: ModalProps) {
 						>
 							Close
 						</Button>
-						{formState === "waiting" && (
+						{showSubmitButton && (
 							<Button
 								variant="filled"
 								leftSection={<TbDeviceFloppy size={20} />}
@@ -325,7 +367,9 @@ export default function RequestModal(props: ModalProps) {
 								)}
 								loading={["submitting"].includes(formState)}
 							>
-								Make Request
+								{props.type === "create"
+									? "Make Request"
+									: "Save"}
 							</Button>
 						)}
 					</Flex>
