@@ -76,14 +76,14 @@ const createColumns = (options: ColumnOptions) => {
 							color: "green",
 							icon: <TbEye />,
 						},
-						{
-							label: "Edit",
-							permission: options.permissions.update,
-							// action: () =>
-							// 	options.actions.edit(props.row.original.id),
-							color: "yellow",
-							icon: <TbPencil />,
-						},
+						// {
+						// 	label: "Edit",
+						// 	permission: options.permissions.update,
+						// 	// action: () =>
+						// 	// 	options.actions.edit(props.row.original.id),
+						// 	color: "yellow",
+						// 	icon: <TbPencil />,
+						// },
 					])}
 				</Flex>
 			),
