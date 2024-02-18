@@ -28,7 +28,7 @@ const sidebarMenus: SidebarMenu[] = [
 			{
 				label: "Users",
 				link: "/users",
-				allowedPermissions: ["users.getAll"],
+				allowedPermissions: ["users.readAll"],
 			},
 			{ label: "Roles", link: "/roles", allowedRoles: ["super-admin"] },
 			{
