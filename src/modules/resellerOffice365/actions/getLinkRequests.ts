@@ -18,6 +18,14 @@ export default async function getLinkRequests(): Promise<
 		if (!user) return unauthorized();
 
 		const requests = await db.office365LinkRequest.findMany({
+			orderBy: [
+                {
+                    status: "asc"
+                },
+                {
+                    requestedAt: "desc"
+                }
+            ],
 			where: {
 				creator: { id: user.id },
 			},

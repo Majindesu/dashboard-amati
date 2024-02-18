@@ -16,7 +16,7 @@ export default async function getAllLinkRequests(): Promise<
 		const requestLinks = await db.office365LinkRequest.findMany({
 			orderBy: [
                 {
-                    status: "desc"
+                    status: "asc"
                 },
                 {
                     requestedAt: "desc"
