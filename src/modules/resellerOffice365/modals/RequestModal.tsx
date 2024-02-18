@@ -35,6 +35,8 @@ import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import getLinkRequestDataById from "../actions/getLinkRequestDataById";
 import { isPagesAPIRouteMatch } from "next/dist/server/future/route-matches/pages-api-route-match";
 import inputLink from "../actions/inputLinks";
+import { Office365LinkRequestStatus } from "@prisma/client";
+import cancelRequest from "../actions/cancelRequest";
 
 export interface ModalProps {
 	title: string;
@@ -46,15 +48,27 @@ export interface ModalProps {
 
 export default function RequestModal(props: ModalProps) {
 	const [formState, setFormState] = useState<
-		"idle" | "submitting" | "waiting" | "fetching" | "error"
+		| "idle"
+		| "submitting"
+		| "waiting"
+		| "fetching"
+		| "error"
+		| "confirming cancel"
+		| "cancelling"
 	>("idle");
 
 	const [errorMessage, setErrorMessage] = useState("");
+	const [requestStatus, setRequestStatus] = useState<
+		Office365LinkRequestStatus | "CREATING"
+	>("CREATING");
 
-	const closeModal = () => {
-		if (formState === "submitting") return; //prevents closing
+	const closeModal = (force?: boolean) => {
+		if (!force){
+			if (["submitting, cancelling"].includes(formState)) return; //prevents closing
+		}
 		//reset state
 		setErrorMessage("");
+		setRequestStatus("CREATING");
 		setFormState("idle");
 		form.reset();
 		props.onClose ? props.onClose() : "";
@@ -94,6 +108,15 @@ export default function RequestModal(props: ModalProps) {
 								link: item.link ?? "",
 							})),
 						});
+						setRequestStatus(data.status);
+						if (
+							data.status === "WAITING" &&
+							props.type === "detail"
+						) {
+							setFormState("waiting");
+						} else {
+							setFormState("idle");
+						}
 					})
 					.catch((e) => {
 						if (e instanceof Error) {
@@ -101,8 +124,6 @@ export default function RequestModal(props: ModalProps) {
 						} else {
 							setErrorMessage("Unkown error occured");
 						}
-					})
-					.finally(() => {
 						setFormState("idle");
 					});
 				break;
@@ -227,12 +248,81 @@ export default function RequestModal(props: ModalProps) {
 		}
 	};
 
+	const handleCancel = () => {
+		if (!props.detailId) return setErrorMessage("Cannot request cancellation. Cause: the ID is empty. Please contact your administrator")
+		setFormState("cancelling")
+		withServerAction(cancelRequest, props.detailId)
+			.then(() => {
+				notifications.show({
+					message: "The request has been cancelled",
+					color: "green"
+				})
+				setFormState("idle")
+				closeModal(true)
+			})
+			.catch(e => {
+				if (e instanceof Error){
+					setErrorMessage(e.message)
+				}
+				setFormState("idle")
+			})
+	}
+
+	const renderActionButtons = () => (
+		<Flex justify="flex-end" align="center" gap="lg" mt="lg">
+			<Button
+				variant="outline"
+				onClick={() => closeModal()}
+				disabled={["submitting"].includes(formState)}
+			>
+				Close
+			</Button>
+			{showCancelButton && (
+				<Button variant="outline" color="red" type="button" onClick={() => setFormState("confirming cancel")}>
+					Cancel Request
+				</Button>
+			)}
+			{showSubmitButton && (
+				<Button
+					variant="filled"
+					leftSection={<TbDeviceFloppy size={20} />}
+					type="submit"
+					disabled={["submitting", "waiting"].includes(formState)}
+					loading={["submitting"].includes(formState)}
+				>
+					{props.type === "create" ? "Make Request" : "Save"}
+				</Button>
+			)}
+		</Flex>
+	);
+
+	const renderCancelConfirmation = () => (
+		<Stack mt="lg" gap={0}>
+			<Text>Are you sure to cancel this link request?</Text>
+			<Flex justify="flex-end" align="center" gap="lg" mt="lg">
+				<Button type="button" variant="outline" onClick={() => setFormState("waiting")}>
+					Cancel
+				</Button>
+				<Button type="button" variant="transparent" color="red" onClick={handleCancel}>
+					Yes, I am sure
+				</Button>
+			</Flex>
+		</Stack>
+	);
+
 	const disableChange = formState !== "idle";
 	const readonly = ["input link", "detail"].includes(props.type);
 	const showSkeleton = formState === "fetching";
 	const showActivationLink = ["input link", "detail"].includes(props.type);
 	const enableInputActivationLink = props.type === "input link";
 	const showSubmitButton = ["create", "input link"].includes(props.type);
+	const showCancelButton =
+		["detail"].includes(props.type) && formState === "waiting";
+	const showCancelRequestConfirmation = [
+		"confirming cancel",
+		"cancelling",
+	].includes(formState);
+	const showWaitingAlert = (["waiting", "confirming cancel"] as typeof formState[]).includes(formState)
 
 	return (
 		<Modal
@@ -248,7 +338,7 @@ export default function RequestModal(props: ModalProps) {
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack gap="md">
-					{formState === "waiting" && (
+					{showWaitingAlert && (
 						<Alert color="orange">
 							Your request is being processed by administrator
 						</Alert>
@@ -349,30 +439,9 @@ export default function RequestModal(props: ModalProps) {
 					</Stack>
 
 					{/* Buttons */}
-					<Flex justify="flex-end" align="center" gap="lg" mt="lg">
-						<Button
-							variant="outline"
-							onClick={closeModal}
-							disabled={["submitting"].includes(formState)}
-						>
-							Close
-						</Button>
-						{showSubmitButton && (
-							<Button
-								variant="filled"
-								leftSection={<TbDeviceFloppy size={20} />}
-								type="submit"
-								disabled={["submitting", "waiting"].includes(
-									formState
-								)}
-								loading={["submitting"].includes(formState)}
-							>
-								{props.type === "create"
-									? "Make Request"
-									: "Save"}
-							</Button>
-						)}
-					</Flex>
+					{showCancelRequestConfirmation
+						? renderCancelConfirmation()
+						: renderActionButtons()}
 				</Stack>
 			</form>
 		</Modal>
