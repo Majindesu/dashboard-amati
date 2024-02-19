@@ -4,6 +4,7 @@ import prisma from "@/db";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
+import db from "@/core/db";
 
 type UserData = {
 	id: string;
@@ -29,7 +30,7 @@ export default async function getUserDetailById(
 	if (!checkPermission("users.read")) return unauthorized();
 
 	// Retrieve user data from the database
-	const user = await prisma.user.findFirst({
+	const user = await db.user.findFirst({
 		where: { id },
 		select: {
 			id: true,

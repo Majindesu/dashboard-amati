@@ -9,6 +9,7 @@ import notFound from "@/modules/dashboard/utils/notFound";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import { revalidatePath } from "next/cache";
 import UserManagementError from "../errors/UserManagementError";
+import db from "@/core/db";
 
 export default async function deleteUser(
 	id: string
@@ -27,7 +28,7 @@ export default async function deleteUser(
 			});
 		}
 
-		const user = await prisma.user.delete({
+		const user = await db.user.delete({
 			where: { id },
 		});
 

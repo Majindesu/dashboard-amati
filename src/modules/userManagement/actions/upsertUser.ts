@@ -12,6 +12,7 @@ import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import hashPassword from "@/modules/auth/utils/hashPassword";
+import db from "@/core/db";
 
 /**
  * Upserts a user based on the provided UserFormData.
@@ -52,7 +53,7 @@ export default async function upsertUser(
 
 		const passwordHash = await hashPassword(validatedFields.data.password!);
 
-		const roles = await prisma.role.findMany({
+		const roles = await db.role.findMany({
 			where: {
 				code: {
 					in: validatedFields.data.roles,
@@ -66,7 +67,7 @@ export default async function upsertUser(
 		// Database operation
 		if (isInsert) {
 			if (
-				await prisma.user.findFirst({
+				await db.user.findFirst({
 					where: {
 						email: userData.email,
 					},
@@ -79,7 +80,7 @@ export default async function upsertUser(
 					},
 				});
 			}
-			await prisma.user.create({
+			await db.user.create({
 				data: {
 					...userData,
 					passwordHash,
@@ -89,7 +90,7 @@ export default async function upsertUser(
 				},
 			});
 		} else {
-			await prisma.user.update({
+			await db.user.update({
 				where: { id: validatedFields.data.id! },
 				data: {
 					...userData,

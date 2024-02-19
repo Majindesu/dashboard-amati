@@ -1,3 +1,4 @@
+import db from "@/core/db";
 import prisma from "@/db";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
@@ -7,7 +8,7 @@ const getAllUsers = async () => {
 	if (!(await checkPermission("users.readAll"))) unauthorized();
 
 	try {
-		const users = await prisma.user.findMany({
+		const users = await db.user.findMany({
 			select: {
 				id: true,
 				email: true,

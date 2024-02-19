@@ -1,5 +1,6 @@
 "use server";
 
+import db from "@/core/db";
 import prisma from "@/db";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
@@ -13,7 +14,7 @@ export default async function deleteRole(
 ): Promise<ServerResponseAction> {
 	try {
 		if (!(await checkPermission("roles.delete"))) return unauthorized();
-		const role = await prisma.role.delete({
+		const role = await db.role.delete({
 			where: { id },
 		});
 

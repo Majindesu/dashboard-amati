@@ -6,6 +6,7 @@ import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import "server-only";
 import Permission from "../types/Permission";
+import db from "@/core/db";
 
 /**
  * Retrieves all permissions along with the count of associated permissions and users.
@@ -21,7 +22,7 @@ export default async function getAllPermissions(): Promise<ServerResponseAction<
 
 	try {
 		// Fetch permissions from the database
-		const permissions = await prisma.permission.findMany({
+		const permissions = await db.permission.findMany({
 			include: {
 				_count: {
 					select: {

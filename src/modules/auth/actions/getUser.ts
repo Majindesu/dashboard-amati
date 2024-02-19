@@ -27,7 +27,7 @@ export default async function getUser() {
 		return {
 			name: user.name ?? "",
 			email: user.email ?? "",
-			photoUrl: user.photoProfile?.path ?? null,
+			photoUrl: user.photoProfile ?? null,
 		};
 	} catch (e: unknown) {
 		// Handle specific authentication errors gracefully

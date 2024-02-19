@@ -9,6 +9,7 @@ import checkPermission from "@/modules/dashboard/services/checkPermission";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
+import db from "@/core/db";
 
 /**
  * Upserts a permission based on the provided PermissionFormData.
@@ -47,7 +48,7 @@ export default async function upsertPermission(
 
 		// Database operation
 		if (isInsert) {
-            if (await prisma.permission.findFirst({
+            if (await db.permission.findFirst({
                 where: {
                     code: permissionData.code
                 }
@@ -59,9 +60,9 @@ export default async function upsertPermission(
                     }
                 })
             }
-			await prisma.permission.create({ data: permissionData });
+			await db.permission.create({ data: permissionData });
 		} else {
-			await prisma.permission.update({
+			await db.permission.update({
 				where: { id: validatedFields.data.id! },
 				data: permissionData,
 			});

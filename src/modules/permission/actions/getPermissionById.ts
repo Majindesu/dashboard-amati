@@ -1,5 +1,6 @@
 "use server";
 
+import db from "@/core/db";
 import prisma from "@/db";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
@@ -20,7 +21,7 @@ export default async function getPermissionById(
 	try {
 		if (!(await checkPermission("permissions.read"))) unauthorized();
 
-		const permission = await prisma.permission.findFirst({
+		const permission = await db.permission.findFirst({
 			where: { id },
 			select: {
 				code: true,

@@ -1,5 +1,6 @@
 "use server";
 
+import db from "@/core/db";
 import prisma from "@/db";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
@@ -10,7 +11,7 @@ import { revalidatePath } from "next/cache";
 export default async function deletePermission(id: string): Promise<ServerResponseAction> {
     try {
         if (!(await checkPermission("permission.delete"))) unauthorized();
-		const permission = await prisma.permission.delete({
+		const permission = await db.permission.delete({
 			where: { id },
 		});
 

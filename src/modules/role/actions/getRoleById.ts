@@ -1,5 +1,6 @@
 "use server";
 
+import db from "@/core/db";
 import prisma from "@/db";
 import checkPermission from "@/modules/dashboard/services/checkPermission";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
@@ -24,7 +25,7 @@ export default async function getRoleById(id: string): Promise<ServerResponseAct
 
 		if (!(await checkPermission("roles.read"))) return unauthorized();
 
-		const role = await prisma.role.findFirst({
+		const role = await db.role.findFirst({
 			where: { id },
 			select: {
 				code: true,

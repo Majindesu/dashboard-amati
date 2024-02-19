@@ -6,6 +6,7 @@ import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import "server-only";
 import Role from "../types/Role";
+import db from "@/core/db";
 
 /**
  * Retrieves all roles along with the count of associated permissions and users.
@@ -23,7 +24,7 @@ export default async function getAllRoles(): Promise<
 		}
 
 		// Fetch roles from the database
-		const roles = await prisma.role.findMany({
+		const roles = await db.role.findMany({
 			include: {
 				_count: {
 					select: {

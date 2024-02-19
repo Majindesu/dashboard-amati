@@ -9,6 +9,7 @@ import checkPermission from "@/modules/dashboard/services/checkPermission";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
+import db from "@/core/db";
 
 /**
  * Upserts a role based on the provided RoleFormData.
@@ -54,7 +55,7 @@ export default async function upsertRole(
 		// Database operation
 		if (isInsert) {
 			if (
-				await prisma.role.findFirst({
+				await db.role.findFirst({
 					where: {
 						code: roleData.code,
 					},
@@ -67,7 +68,7 @@ export default async function upsertRole(
 					},
 				});
 			}
-			await prisma.role.create({
+			await db.role.create({
 				data: {
 					...roleData,
 					permissions: {
@@ -76,7 +77,7 @@ export default async function upsertRole(
 				},
 			});
 		} else {
-			await prisma.role.update({
+			await db.role.update({
 				where: { id: validatedFields.data.id! },
 				data: { ...roleData, permissions: { connect: permissionIds } },
 			});
