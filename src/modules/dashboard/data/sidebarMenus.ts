@@ -33,12 +33,12 @@ const sidebarMenus: SidebarMenu[] = [
 			{
 				label: "My Request Links",
 				link: "/reseller-office-365/request",
-				allowedRoles: ["*"]
+				allowedRoles: ["reseller-office-365"]
 			},
 			{
 				label: "Process Request Link",
 				link: "/reseller-office-365/list",
-				allowedRoles: ["*"]
+				allowedRoles: ["admin-reseller-office-365"]
 			}
 		]
 	}
