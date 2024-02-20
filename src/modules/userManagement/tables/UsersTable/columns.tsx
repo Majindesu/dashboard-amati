@@ -11,6 +11,7 @@ export interface UserRow {
 	name: string | null;
 	email: string | null;
 	photoUrl: string | null;
+	roles: string[]
 }
 
 interface ColumnOptions {
@@ -62,6 +63,11 @@ const createColumns = (options: ColumnOptions) => {
 					{props.getValue()}
 				</Anchor>
 			),
+		}),
+
+		columnHelper.accessor("roles", {
+			header: "Role",
+			cell: (props) => <Text>{props.getValue()[0]}</Text>
 		}),
 
 		columnHelper.display({

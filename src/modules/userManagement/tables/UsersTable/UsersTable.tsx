@@ -33,7 +33,7 @@ export default function UsersTable(props: Props) {
 	});
 
 	const table = useReactTable({
-		data: props.userData,
+		data: props.userData.map(data => ({...data, roles: data.roles.map(x => x.name)})),
 		columns: createColumns({
 			permissions: props.permissions,
 			actions: {
