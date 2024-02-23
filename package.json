@@ -5,10 +5,9 @@
   "scripts": {
     "check-env": "bun run ./env.ts",
     "dev": "bun run check-env && next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "key:generate": "bun run src/core/utils/generateJwtSecret.ts"
+    "build": "bun run check-env && next build",
+    "start": "bun run check-env && next start",
+    "lint": "next lint"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
