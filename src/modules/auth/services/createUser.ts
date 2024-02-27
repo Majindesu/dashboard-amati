@@ -10,6 +10,16 @@ import hashPassword from "../utils/hashPassword";
 import { createJwtToken } from "../utils/createJwtToken";
 import { cookies } from "next/headers";
 
+/**
+ * Creates a new user in the database after validating the input data.
+ * It throws errors if the input data is invalid or if the user already exists.
+ * On successful creation, it returns a token for the created user.
+ *
+ * @param userData - The user data to create a new user. Must conform to CreateUserSchema.
+ * @returns  An object containing the JWT token for the newly created user.
+ * @throws If the input validation fails.
+ * @throws If the user already exists in the database.
+ */
 export default async function createUser(userData: CreateUserSchema) {
 	const validatedFields = createUserSchema.safeParse(userData);
 

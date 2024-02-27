@@ -1,34 +1,31 @@
 "use server";
 
-import "server-only";
-import AuthError from "../error/AuthError";
 import getMyDetail from "../services/getMyDetail";
+import AuthError from "../error/AuthError";
+import BaseError from "@/core/error/BaseError";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
-import BaseError from "@/core/error/BaseError";
+import "server-only";
 
 /**
- * Retrieves the user details based on the JWT token from cookies.
- * This function is designed to be used in a server-side context within a Next.js application.
- * It attempts to parse the user's token, fetch the user's details, and format the response.
- * If the token is invalid or the user cannot be found, it gracefully handles these cases.
+ * Asynchronously retrieves the authenticated user's details from a server-side context in a Next.js application.
+ * This function uses a JWT token obtained from cookies to authenticate the user and fetch their details.
+ * If the authentication fails due to an invalid JWT token, or if any other error occurs, the function handles these errors gracefully.
  *
- * @returns A promise that resolves to the user's details object or null if the user cannot be authenticated or an error occurs.
- * @throws an error if an unexpected error occurs during execution.
+ * @returns  A promise that resolves to a `ServerResponseAction` object. This object includes a `success` flag indicating the operation's outcome, the user's details in the `data` field if successful, or an error object in the `error` field if an error occurs.
+ * @throws an unhandled error if an unexpected error occurs during the function execution.
  */
-export default async function getMyDetailAction(): Promise<
-	ServerResponseAction<Awaited<ReturnType<typeof getMyDetail>>>
-> {
+export default async function getMyDetailAction(): Promise<ServerResponseAction<Awaited<ReturnType<typeof getMyDetail>>>> {
 	try {
+		// Attempt to fetch and return the user's details.
+		const userDetails = await getMyDetail();
 		return {
 			success: true,
-			data: await getMyDetail(),
+			data: userDetails,
 		};
 	} catch (e: unknown) {
-		if (
-			e instanceof AuthError &&
-			["INVALID_JWT_TOKEN"].includes(e.errorCode)
-		) {
+		// Check if the error is an instance of AuthError and handle it.
+		if (e instanceof AuthError && e.errorCode === "INVALID_JWT_TOKEN") {
 			return {
 				success: false,
 				error: new BaseError({
@@ -37,6 +34,7 @@ export default async function getMyDetailAction(): Promise<
 				}),
 			};
 		}
+		// Handle other types of errors.
 		return handleCatch(e);
 	}
 }
