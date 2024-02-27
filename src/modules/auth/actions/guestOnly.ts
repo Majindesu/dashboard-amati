@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import getUser from "./getUser";
+import getUser from "./getMyDetailAction";
 
 export default async function guestOnly() {
 	const user = await getUser();

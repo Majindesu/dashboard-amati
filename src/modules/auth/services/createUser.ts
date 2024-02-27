@@ -23,7 +23,7 @@ export default async function createUser(userData: CreateUserSchema) {
 		});
 	}
 
-	//Check email exists    
+	//Check email exists
 	if (
 		await db.user.findFirst({
 			where: { email: validatedFields.data.email },

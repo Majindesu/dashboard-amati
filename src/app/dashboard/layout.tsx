@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import logo from "@/assets/logos/logo.png";
 import DashboardLayout from "@/modules/dashboard/components/DashboardLayout";
-import getUser from "@/modules/auth/actions/getUser";
+import getUser from "@/modules/auth/actions/getMyDetailAction";
 import { redirect } from "next/navigation";
 import { Notifications } from "@mantine/notifications";
 

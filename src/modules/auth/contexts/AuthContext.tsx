@@ -9,7 +9,10 @@ import React, {
 	useMemo,
 	useState,
 } from "react";
-import getUser from "../actions/getUser";
+import getUser from "../actions/getMyDetailAction";
+import withServerAction from "@/modules/dashboard/utils/withServerAction";
+import getMyDetailAction from "../actions/getMyDetailAction";
+import { notifications } from "@mantine/notifications";
 
 interface UserData {
 	name: string;
@@ -34,14 +37,14 @@ export const AuthContextProvider = ({ children }: Props) => {
 	const [user, setUser] = useState<UserData | null>(null);
 
 	const fetchUserData = useCallback(() => {
-		const getUserData = async () => {
-			const user = await getUser();
-			setUser(user);
-		};
-
-		getUserData()
-			.then(() => {})
-			.catch(() => {});
+		
+		withServerAction(getMyDetailAction)
+			.then((response) => {
+				setUser(response.data);
+			})
+			.catch((error) => {
+				console.error("Error while retrieving user data")
+			})
 	}, []);
 
 	useEffect(() => {

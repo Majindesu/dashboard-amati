@@ -1,9 +1,11 @@
 "use server";
 
-import { cookies } from "next/headers";
 import "server-only";
-import getUserFromToken from "../utils/getUserFromToken";
 import AuthError from "../error/AuthError";
+import getMyDetail from "../services/getMyDetail";
+import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
+import handleCatch from "@/modules/dashboard/utils/handleCatch";
+import BaseError from "@/core/error/BaseError";
 
 /**
  * Retrieves the user details based on the JWT token from cookies.
@@ -14,26 +16,27 @@ import AuthError from "../error/AuthError";
  * @returns A promise that resolves to the user's details object or null if the user cannot be authenticated or an error occurs.
  * @throws an error if an unexpected error occurs during execution.
  */
-export default async function getUser() {
+export default async function getMyDetailAction(): Promise<
+	ServerResponseAction<Awaited<ReturnType<typeof getMyDetail>>>
+> {
 	try {
-		const token = cookies().get("token");
-
-		if (!token) return null;
-
-		const user = await getUserFromToken(token.value);
-
-		if (!user) return null;
-
 		return {
-			name: user.name ?? "",
-			email: user.email ?? "",
-			photoUrl: user.photoProfile ?? null,
+			success: true,
+			data: await getMyDetail(),
 		};
 	} catch (e: unknown) {
-		// Handle specific authentication errors gracefully
-		if (e instanceof AuthError && e.errorCode === "INVALID_JWT_TOKEN") {
-			return null;
+		if (
+			e instanceof AuthError &&
+			["INVALID_JWT_TOKEN"].includes(e.errorCode)
+		) {
+			return {
+				success: false,
+				error: new BaseError({
+					errorCode: e.errorCode,
+					message: "You are not authenticated",
+				}),
+			};
 		}
-		throw e;
+		return handleCatch(e);
 	}
 }
