@@ -1,68 +1,41 @@
 "use server";
-import prisma from "@/core/db";
-import { User } from "@prisma/client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import AuthError from "../error/AuthError";
-import comparePassword from "../utils/comparePassword";
-import { createJwtToken } from "../utils/createJwtToken";
+import signIn from "../services/signIn";
 
 /**
- * Handles the sign-in process for a user.
- *
- * This function validates a user's credentials (email and password), checks against the database,
- * and on successful validation, redirects the user to the dashboard and sets a cookie with a JWT token.
- * If the validation fails at any stage, it throws a custom AuthError.
- *
- * @param prevState - The previous state of the application, not currently used.
- * @param rawFormData - The raw form data containing the user's email and password.
- * @returns A promise that resolves to a redirect to the dashboard on successful authentication,
- *          or an object containing error details on failure.
- * @throws Specific authentication error based on the failure stage.
+ * Asynchronously handles the sign-in process for a user by validating their credentials against the database.
+ * Upon successful validation, the user is redirected to the dashboard, and a JWT token is set as a cookie.
+ * If validation fails, a custom `AuthError` is thrown, and detailed error information is provided to the caller.
+ * 
+ * Note: Future enhancements should include throttling to prevent brute force attacks and a check to prevent
+ * sign-in attempts if the user is already logged in.
+ * 
+ * @param prevState - The previous state of the application. Currently not utilized but may be used for future enhancements.
+ * @param rawFormData - The raw form data obtained from the sign-in form, containing the user's email and password.
+ * @returns A promise that, upon successful authentication, resolves to a redirection to the dashboard. If authentication fails,
+ *          it resolves to an object containing error details.
+ * @throws {AuthError} - Throws a custom `AuthError` with specific error codes for different stages of the authentication failure.
  */
-export default async function signIn(prevState: any, rawFormData: FormData) {
+export default async function signInAction(prevState: any, rawFormData: FormData) {
 	//TODO: Add Throttling
 	//TODO: Add validation check if the user is already logged in
 	try {
+		// Extract email and password from the raw form data.
 		const formData = {
 			email: rawFormData.get("email") as string,
 			password: rawFormData.get("password") as string,
 		};
 
-		// Retrieve user from the database by email
-		const user = await prisma.user.findUnique({
-			where: { email: formData.email },
-		});
+		// Attempt to sign in with the provided credentials.
+		const result = await signIn(formData)
 
-		// Throw if user not found
-		if (!user)
-			throw new AuthError({
-				errorCode: "EMAIL_NOT_FOUND",
-				message: "Email or Password does not match",
-			});
+		// Set the JWT token in cookies upon successful sign-in.
+		cookies().set("token", result.token);
 
-		// Throw if user has no password hash
-		// TODO: Add check if the user uses another provider
-		if (!user.passwordHash)
-			throw new AuthError({ errorCode: "EMPTY_USER_HASH" });
-
-		// Compare the provided password with the user's stored password hash
-		const isMatch = await comparePassword(
-			formData.password,
-			user.passwordHash
-		);
-		if (!isMatch)
-			throw new AuthError({
-				errorCode: "INVALID_CREDENTIALS",
-				message: "Email or Password does not match",
-			});
-
-		//Set cookie
-		//TODO: Auth: Add expiry
-		const token = createJwtToken({ id: user.id });
-
-		cookies().set("token", token);
+		// Redirect to the dashboard after successful sign-in.
+		redirect("/dashboard");
 	} catch (e: unknown) {
 		// Custom error handling for authentication errors
 		if (e instanceof AuthError) {
@@ -94,6 +67,4 @@ export default async function signIn(prevState: any, rawFormData: FormData) {
 			},
 		};
 	}
-
-	redirect("/dashboard");
 }
