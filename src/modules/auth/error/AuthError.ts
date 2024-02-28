@@ -7,11 +7,13 @@ export const AuthErrorCodes = [
 	"INVALID_JWT_TOKEN",
 	"JWT_SECRET_EMPTY",
 	"USER_ALREADY_EXISTS",
+	"ALREADY_LOGGED_IN"
 ] as const;
 
 interface AuthErrorOptions {
 	message?: string;
 	errorCode: (typeof AuthErrorCodes)[number] | (string & {});
+	statusCode?: number;
 }
 
 export default class AuthError extends BaseError {
@@ -21,6 +23,7 @@ export default class AuthError extends BaseError {
 		super({
 			errorCode: options.errorCode,
 			message: options.message,
+			statusCode: options.statusCode,
 		});
 
 		this.errorCode = options.errorCode;
