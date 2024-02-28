@@ -1,6 +1,6 @@
 "use client";
 
-import logout from "@/modules/auth/actions/logout";
+import logoutAction from "@/modules/auth/actions/logoutAction";
 import { useEffect } from "react";
 
 /**
@@ -9,9 +9,9 @@ import { useEffect } from "react";
  */
 export default function LogoutPage() {
 	useEffect(() => {
-		const logoutAction = async () => await logout();
-
-		logoutAction();
+		(async () => await logoutAction())()
+			.then(() => {})
+			.catch(() => {});
 	}, []);
 
 	return <div></div>;
