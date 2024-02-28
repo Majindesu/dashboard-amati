@@ -56,7 +56,6 @@ export default async function createUser(userData: CreateUserSchema) {
 
 	//Set token
 	const token = createJwtToken({ id: user.id });
-	cookies().set("token", token);
 
 	return {
 		token,

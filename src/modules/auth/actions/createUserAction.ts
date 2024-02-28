@@ -21,7 +21,8 @@ export default async function createUserAction(formData: CreateUserSchema): Prom
 	//TODO: Add validation check if the user is already logged in
 
 	try {
-		await createUser(formData);
+		const result = await createUser(formData);
+		cookies().set("token", result.token);
 		redirect("/dashboard");
 	} catch (e) {
 		return handleCatch(e)
