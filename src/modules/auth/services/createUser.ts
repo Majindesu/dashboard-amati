@@ -1,4 +1,3 @@
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import {
 	CreateUserSchema,
 	createUserSchema,
@@ -8,7 +7,7 @@ import db from "@/core/db";
 import AuthError from "../error/AuthError";
 import hashPassword from "../utils/hashPassword";
 import { createJwtToken } from "../utils/createJwtToken";
-import { cookies } from "next/headers";
+import BaseError from "@/core/error/BaseError";
 
 /**
  * Creates a new user in the database after validating the input data.
@@ -25,11 +24,12 @@ export default async function createUser(userData: CreateUserSchema) {
 
 	//Validate form input
 	if (!validatedFields.success) {
-		throw new DashboardError({
+		throw new BaseError({
 			errorCode: "INVALID_FORM_DATA",
 			formErrors: mapObjectToFirstValue(
 				validatedFields.error.flatten().fieldErrors
 			),
+			statusCode: 422,
 		});
 	}
 
@@ -42,6 +42,7 @@ export default async function createUser(userData: CreateUserSchema) {
 		throw new AuthError({
 			errorCode: "USER_ALREADY_EXISTS",
 			message: "This email already exists",
+			statusCode: 422,
 		});
 	}
 
@@ -59,5 +60,10 @@ export default async function createUser(userData: CreateUserSchema) {
 
 	return {
 		token,
+		user: {
+			name: user.name,
+			email: user.email,
+			profilePhotoUrl: user.photoProfile,
+		},
 	};
 }

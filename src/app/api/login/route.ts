@@ -1,4 +1,4 @@
-import BaseError from "@/core/error/BaseError";
+import applicationJsonOnly from "@/core/utils/applicationJsonOnly";
 import handleCatchApi from "@/core/utils/handleCatchApi";
 import AuthError from "@/modules/auth/error/AuthError";
 import signInSchema from "@/modules/auth/formSchemas/signInSchema";
@@ -9,13 +9,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
 	try {
-		if (request.headers.get("Content-Type") !== "application/json")
-			throw new BaseError({
-				errorCode: "UNSUPPORTED_CONTENT_TYPE",
-				message:
-					"This content type is not supported. Please use application/json instead",
-                statusCode: 400
-			});
+		applicationJsonOnly(request.headers)
 		const data = signInSchema.safeParse(await request.json());
 
         if (!data.success){

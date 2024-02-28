@@ -1,21 +1,24 @@
 import logger from "../logger/Logger";
 
-export const BaseErrorCodes = ["UNKNOWN_ERROR", "UNSUPPORTED_CONTENT_TYPE"] as const;
+export const BaseErrorCodes = ["UNKNOWN_ERROR", "UNSUPPORTED_CONTENT_TYPE", "INVALID_FORM_DATA"] as const;
 
 interface ErrorOptions {
 	message?: string;
 	errorCode: (typeof BaseErrorCodes)[number] | (string & {});
-	statusCode?: number
+	statusCode?: number,
+	formErrors?: Record<string, string>
 }
 
 class BaseError extends Error {
 	public readonly errorCode: (typeof BaseErrorCodes)[number] | (string & {});
 	public readonly statusCode: number;
+	public readonly formErrors?: ErrorOptions['formErrors'];
 
 	constructor(options: ErrorOptions) {
 		super(options.message ?? "Undetermined Error");
 		this.errorCode = options.errorCode ?? "UNKNOWN_ERROR";
 		this.statusCode = options.statusCode ?? 500;
+		this.formErrors = options.formErrors;
 
 		Object.setPrototypeOf(this, new.target.prototype);
 

@@ -11,7 +11,7 @@ interface ErrorOptions {
 class ClientError extends Error {
 	public readonly errorCode: ErrorOptions['errorCode'];
 	public readonly statusCode: ErrorOptions['statusCode'];
-    public readonly formErrors?: ErrorOptions['formErrors']
+    public readonly formErrors?: ErrorOptions['formErrors'];
 
 	constructor(options: ErrorOptions) {
 		super(options.message ?? "Undetermined Error");

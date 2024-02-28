@@ -6,6 +6,7 @@ export default function handleCatchApi(e: unknown): NextResponse {
 		return NextResponse.json({
 			code: e.errorCode,
 			message: e.message,
+			formErrors: e.formErrors
 		}, {status: e.statusCode});
 	}
 	if (e instanceof Error) {

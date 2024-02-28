@@ -6,8 +6,8 @@ import {z} from "zod"
 export interface CreateUserSchema {
 	name: string;
 	email: string;
-	plainPassword: string;
-    plainPasswordConfirmation: string;
+	password: string;
+    passwordConfirmation: string;
 }
 
 export const createUserSchema = z
