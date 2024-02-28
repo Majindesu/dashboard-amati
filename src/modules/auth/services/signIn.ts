@@ -50,5 +50,5 @@ export default async function signIn(rawCredential: SignInFormData) {
 
 	const token = createJwtToken({ id: user.id });
 
-	return { token };
+	return { token, user: { name: user.name, email: user.email, profilePhotoUrl: user.photoProfile} };
 }
