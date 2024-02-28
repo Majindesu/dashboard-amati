@@ -1,5 +1,5 @@
 "use client";
-import signIn from "@/modules/auth/actions/signIn";
+import signIn from "@/modules/auth/actions/signInAction";
 import {
 	Paper,
 	PasswordInput,
