@@ -1,6 +1,10 @@
 "use client";
 
-import createUser from "@/modules/auth/actions/createUser";
+import createUserAction from "@/modules/auth/actions/createUserAction";
+import createUser from "@/modules/auth/actions/createUserAction";
+import { CreateUserSchema } from "@/modules/auth/formSchemas/CreateUserFormSchema";
+import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import {
 	Paper,
 	PasswordInput,
@@ -12,65 +16,53 @@ import {
 	Button,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { showNotification } from "@mantine/notifications";
 import React, { useEffect, useState } from "react";
-
-export interface RegisterFormSchema {
-	email: string;
-	password: string;
-	passwordConfirmation: string;
-	name: string;
-}
 
 export default function RegisterPage() {
 	const [errorMessage, setErrorMessage] = useState("");
 
-	const form = useForm<RegisterFormSchema>({
+	const form = useForm<CreateUserSchema>({
 		initialValues: {
 			email: "",
-			password: "",
-			passwordConfirmation: "",
+			plainPassword: "",
+			plainPasswordConfirmation: "",
 			name: "",
 		},
 		validate: {
 			email: (value: string) =>
 				/^\S+@\S+$/.test(value) ? null : "Invalid email",
-			password: (value: string) =>
+			plainPassword: (value: string) =>
 				value.length >= 6
 					? null
 					: "Password should be at least 6 characters",
-			passwordConfirmation: (value: string, values: RegisterFormSchema) =>
-				value === values.password ? null : "Passwords should match",
+			plainPasswordConfirmation: (value: string, values: CreateUserSchema) =>
+				value === values.plainPassword ? null : "Passwords should match",
 			name: (value: string) =>
 				value.length > 0 ? null : "Name is required",
 		},
 	});
 
-	const handleSubmit = async (values: RegisterFormSchema) => {
-		const formData = new FormData();
-		Object.entries(values).forEach(([key, value]) => {
-			formData.append(key, value);
-		});
-
-		const response = await createUser(formData);
-
-		if (!response.success) {
-			setErrorMessage(response.error.message);
-
-			if (response.error.errors) {
-				const errors = Object.entries(response.error.errors).reduce(
-					(prev, [k, v]) => {
-						prev[k] = v[0];
-						return prev;
-					},
-					{} as { [k: string]: string }
-				);
-
-				form.setErrors(errors);
-				console.log(form.errors);
-			} else {
-				form.clearErrors();
-			}
-		}
+	const handleSubmit = async (values: CreateUserSchema) => {
+		withServerAction(createUserAction, form.values)
+			.then((response) => {
+				showNotification({message: "Register Success", color: "green"})
+			})
+			.catch((e) => {
+				if (e instanceof DashboardError) {
+					if (e.errorCode === "INVALID_FORM_DATA") {
+						form.setErrors(e.formErrors ?? {});
+					} else {
+						setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
+					}
+				} else if (e instanceof Error) {
+					setErrorMessage(`ERROR: ${e.message}`);
+				} else {
+					setErrorMessage(
+						`Unkown error is occured. Please contact administrator`
+					);
+				}
+			})
 	};
 
 	return (
@@ -102,14 +94,14 @@ export default function RegisterPage() {
 							placeholder="Your password"
 							name="password"
 							autoComplete="new-password"
-							{...form.getInputProps("password")}
+							{...form.getInputProps("plainPassword")}
 						/>
 						<PasswordInput
 							label="Repeat Password"
 							placeholder="Repeat yout password"
 							name="passwordConfirmation"
 							autoComplete="new-password"
-							{...form.getInputProps("passwordConfirmation")}
+							{...form.getInputProps("plainPasswordConfirmation")}
 						/>
 					</Stack>
 

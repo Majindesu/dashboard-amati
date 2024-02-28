@@ -94,7 +94,7 @@ export default async function permissionSeed(prisma: PrismaClient) {
             isActive: true
         }
     ];
-
+    
     await Promise.all(
         permissionData.map(async (permission) => {
             await prisma.permission.upsert({

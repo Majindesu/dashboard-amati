@@ -1,5 +1,4 @@
 "use client";
-import getUser from "@/modules/auth/actions/getUser";
 import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
 import { Table, Text, Flex, Button, Center } from "@mantine/core";
 import {
