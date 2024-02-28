@@ -6,6 +6,8 @@ import BaseError from "@/core/error/BaseError";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import "server-only";
+import { cookies } from "next/headers";
+import getUserFromToken from "../utils/getUserFromToken";
 
 /**
  * Asynchronously retrieves the authenticated user's details from a server-side context in a Next.js application.
@@ -17,8 +19,13 @@ import "server-only";
  */
 export default async function getMyDetailAction(): Promise<ServerResponseAction<Awaited<ReturnType<typeof getMyDetail>>>> {
 	try {
+		const token = cookies().get("token");
+
+		// Return null if token is not present
+		if (!token) throw new AuthError({errorCode: "INVALID_JWT_TOKEN"});
+
 		// Attempt to fetch and return the user's details.
-		const userDetails = await getMyDetail();
+		const userDetails = await getMyDetail(token.value);
 		return {
 			success: true,
 			data: userDetails,
