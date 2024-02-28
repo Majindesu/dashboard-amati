@@ -1,4 +1,4 @@
-import DashboardError from "../errors/DashboardError";
+import ClientError from "@/core/error/ClientError";
 import ServerResponseAction from "../types/ServerResponseAction";
 
 /**
@@ -21,7 +21,7 @@ async function withServerAction<T, Args extends unknown[] = []>(
 	} else {
         if (result.dashboardError && result.error) {
 			const errorDetails = result.error;
-			throw new DashboardError({
+			throw new ClientError({
 				message: errorDetails.message,
 				errorCode: errorDetails.errorCode,
 				formErrors: errorDetails.errors,

@@ -4,14 +4,10 @@ import {
 	Flex,
 	Modal,
 	Stack,
-	Switch,
 	TextInput,
-	Textarea,
 	Button,
 	ScrollArea,
-	Checkbox,
 	Skeleton,
-	Fieldset,
 	Alert,
 	Center,
 	Avatar,
@@ -20,7 +16,7 @@ import {
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
 import userFormDataSchema, {
 	UserFormData,
@@ -28,7 +24,7 @@ import userFormDataSchema, {
 import getUserDetailById from "../actions/getUserDetailById";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import upsertUser from "../actions/upsertUser";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import ClientError from "@/core/error/ClientError";
 import stringToColorHex from "@/core/utils/stringToColorHex";
 import getAllRoles from "@/modules/role/actions/getAllRoles";
 import Role from "@/modules/role/types/Role";
@@ -122,7 +118,7 @@ export default function UserFormModal(props: ModalProps) {
 				closeModal();
 			})
 			.catch((e) => {
-				if (e instanceof DashboardError) {
+				if (e instanceof ClientError) {
 					if (e.errorCode === "INVALID_FORM_DATA") {
 						form.setErrors(e.formErrors ?? {});
 					} else {

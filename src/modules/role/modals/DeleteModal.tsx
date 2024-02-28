@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
 	Button,
@@ -11,7 +10,7 @@ import {
 import { showNotification } from "@/utils/notifications";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import deleteRole from "../actions/deleteRole";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import ClientError from "@/core/error/ClientError";
 
 export interface DeleteModalProps {
 	data?: {
@@ -22,7 +21,6 @@ export interface DeleteModalProps {
 }
 
 export default function DeleteModal(props: DeleteModalProps) {
-	const router = useRouter();
 
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
@@ -49,7 +47,7 @@ export default function DeleteModal(props: DeleteModalProps) {
                 props.onClose()
 			})
 			.catch((e) => {
-                if (e instanceof DashboardError){
+                if (e instanceof ClientError){
                     setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`)
                 }
                 else if (e instanceof Error) {

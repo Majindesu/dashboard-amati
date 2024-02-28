@@ -3,10 +3,7 @@ import handleCatchApi from "@/core/utils/handleCatchApi";
 import AuthError from "@/modules/auth/error/AuthError";
 import signInSchema from "@/modules/auth/formSchemas/signInSchema";
 import signIn from "@/modules/auth/services/signIn";
-import getTokenFromHeaders from "@/modules/auth/utils/getTokenFromHeaders";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { json } from "stream/consumers";
 
 export const dynamic = "force-dynamic";
 

@@ -4,7 +4,6 @@ import { Text, Flex, Button } from "@mantine/core";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import React, { useState } from "react";
 import { TbPlus } from "react-icons/tb";
-import getAllRoles from "../../actions/getAllRoles";
 import FormModal, { ModalProps } from "../../modals/FormModal";
 import DeleteModal, { DeleteModalProps } from "../../modals/DeleteModal";
 import createColumns from "./columns";

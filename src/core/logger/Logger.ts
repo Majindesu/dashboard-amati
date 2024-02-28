@@ -1,3 +1,4 @@
+import "server-only"
 import { appendFileSync } from "node:fs";
 import { format } from 'date-fns';
 

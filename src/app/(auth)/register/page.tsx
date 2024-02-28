@@ -1,9 +1,8 @@
 "use client";
 
+import ClientError from "@/core/error/ClientError";
 import createUserAction from "@/modules/auth/actions/createUserAction";
-import createUser from "@/modules/auth/actions/createUserAction";
 import { CreateUserSchema } from "@/modules/auth/formSchemas/CreateUserFormSchema";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import {
 	Paper,
@@ -17,10 +16,11 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 export default function RegisterPage() {
-	const [errorMessage, setErrorMessage] = useState("");
+	//TODO: Display error message
+	// const [errorMessage, setErrorMessage] = useState("");
 
 	const form = useForm<CreateUserSchema>({
 		initialValues: {
@@ -43,24 +43,24 @@ export default function RegisterPage() {
 		},
 	});
 
-	const handleSubmit = async (values: CreateUserSchema) => {
+	const handleSubmit = async () => {
 		withServerAction(createUserAction, form.values)
-			.then((response) => {
+			.then(() => {
 				showNotification({message: "Register Success", color: "green"})
 			})
 			.catch((e) => {
-				if (e instanceof DashboardError) {
+				if (e instanceof ClientError) {
 					if (e.errorCode === "INVALID_FORM_DATA") {
 						form.setErrors(e.formErrors ?? {});
 					} else {
-						setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
+						// setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`);
 					}
 				} else if (e instanceof Error) {
-					setErrorMessage(`ERROR: ${e.message}`);
+					// setErrorMessage(`ERROR: ${e.message}`);
 				} else {
-					setErrorMessage(
-						`Unkown error is occured. Please contact administrator`
-					);
+					// setErrorMessage(
+					// 	`Unkown error is occured. Please contact administrator`
+					// );
 				}
 			})
 	};
@@ -72,7 +72,7 @@ export default function RegisterPage() {
 					Register
 				</Text>
 				<form
-					onSubmit={form.onSubmit((values) => handleSubmit(values))}
+					onSubmit={form.onSubmit(() => handleSubmit())}
 				>
 					<Stack>
 						<TextInput

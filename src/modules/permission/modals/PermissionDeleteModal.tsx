@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
 	Button,
@@ -9,11 +8,9 @@ import {
 	Alert,
 } from "@mantine/core";
 import { showNotification } from "@/utils/notifications";
-import { error } from "console";
-import { revalidatePath } from "next/cache";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import deletePermission from "../actions/deletePermission";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import ClientError from "@/core/error/ClientError";
 
 export interface DeleteModalProps {
 	data?: {
@@ -24,8 +21,6 @@ export interface DeleteModalProps {
 }
 
 export default function DeleteModal(props: DeleteModalProps) {
-	const router = useRouter();
-
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 
@@ -51,7 +46,7 @@ export default function DeleteModal(props: DeleteModalProps) {
                 props.onClose()
 			})
 			.catch((e) => {
-                if (e instanceof DashboardError){
+                if (e instanceof ClientError){
                     setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`)
                 }
                 else if (e instanceof Error) {

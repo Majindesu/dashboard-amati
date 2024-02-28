@@ -1,10 +1,6 @@
 "use server";
-import { z } from "zod";
-import prisma from "@/core/db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { hashPassword } from "../utils/hashPassword";
-import { createJwtToken } from "../utils/createJwtToken";
 import createUser from "../services/createUser";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";

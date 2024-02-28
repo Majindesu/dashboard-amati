@@ -4,25 +4,23 @@ import {
 	Flex,
 	Modal,
 	Stack,
-	Switch,
 	TextInput,
 	Textarea,
 	Button,
 	ScrollArea,
 	Checkbox,
 	Skeleton,
-	Fieldset,
 	Alert,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
 import permissionFormDataSchema, { PermissionFormData } from "../formSchemas/PermissionFormData";
 import getPermissionById from "../actions/getPermissionById";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import upsertPermission from "../actions/upsertPermission";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import ClientError from "@/core/error/ClientError";
 
 export interface ModalProps {
 	title: string;
@@ -103,7 +101,7 @@ export default function FormModal(props: ModalProps) {
 				closeModal();
 			})
 			.catch((e) => {
-				if (e instanceof DashboardError) {
+				if (e instanceof ClientError) {
 					if (e.errorCode === "INVALID_FORM_DATA") {
 						form.setErrors(e.formErrors ?? {});
 					} else {

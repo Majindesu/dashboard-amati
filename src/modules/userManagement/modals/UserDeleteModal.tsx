@@ -1,23 +1,16 @@
 "use client";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
-	Avatar,
 	Button,
-	Center,
 	Flex,
 	Modal,
-	ScrollArea,
 	Text,
-	Stack,
-	TextInput,
-	Title,
 	Alert,
 } from "@mantine/core";
 import { showNotification } from "@/utils/notifications";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import deleteUser from "../actions/deleteUser";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
+import ClientError from "@/core/error/ClientError";
 
 export interface DeleteModalProps {
 	data?: {
@@ -28,7 +21,6 @@ export interface DeleteModalProps {
 }
 
 export default function UserDeleteModal(props: DeleteModalProps) {
-	const router = useRouter();
 
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
@@ -55,7 +47,7 @@ export default function UserDeleteModal(props: DeleteModalProps) {
                 props.onClose()
 			})
 			.catch((e) => {
-                if (e instanceof DashboardError){
+                if (e instanceof ClientError){
                     setErrorMessage(`ERROR: ${e.message} (${e.errorCode})`)
                 }
                 else if (e instanceof Error) {
