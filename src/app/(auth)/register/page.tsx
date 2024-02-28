@@ -25,19 +25,19 @@ export default function RegisterPage() {
 	const form = useForm<CreateUserSchema>({
 		initialValues: {
 			email: "",
-			plainPassword: "",
-			plainPasswordConfirmation: "",
+			password: "",
+			passwordConfirmation: "",
 			name: "",
 		},
 		validate: {
 			email: (value: string) =>
 				/^\S+@\S+$/.test(value) ? null : "Invalid email",
-			plainPassword: (value: string) =>
+			password: (value: string) =>
 				value.length >= 6
 					? null
 					: "Password should be at least 6 characters",
-			plainPasswordConfirmation: (value: string, values: CreateUserSchema) =>
-				value === values.plainPassword ? null : "Passwords should match",
+			passwordConfirmation: (value: string, values: CreateUserSchema) =>
+				value === values.password ? null : "Passwords should match",
 			name: (value: string) =>
 				value.length > 0 ? null : "Name is required",
 		},
