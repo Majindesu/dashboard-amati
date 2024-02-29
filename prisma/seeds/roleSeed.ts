@@ -12,19 +12,6 @@ export default async function roleSeed(prisma: PrismaClient) {
 			isActive: true,
 			name: "Super Admin",
 		},
-		{
-			code: "reseller-office-365",
-			description: "Has ability to make request Office 365 links",
-			isActive: true,
-			name: "Reseller Office 365",
-		},
-		{
-			code: "admin-reseller-office-365",
-			description:
-				"Has ability to accept and provide links to Office 365 link request",
-			isActive: true,
-			name: "Admin Reseller Office 365",
-		},
 	];
 
 	await Promise.all(

@@ -16,7 +16,6 @@ model User {
   photoProfile      String?
   directPermissions Permission[]       @relation("PermissionToUser")
   roles             Role[]             @relation("RoleToUser")
-  linkRequests      Office365LinkRequest[]
 }
 
 model Role {
@@ -37,33 +36,4 @@ model Permission {
   isActive    Boolean @default(false)
   roles       Role[]  @relation("PermissionToRole")
   directUsers User[]  @relation("PermissionToUser")
-}
-
-enum Office365LinkRequestStatus {
-  WAITING
-  ACCEPTED
-  CANCELLED
-  REJECTED
-}
-
-model Office365LinkRequest {
-  id          String                      @id @default(cuid())
-  creator     User                        @relation(fields: [createdBy], references: [id])
-  status      Office365LinkRequestStatus  @default(WAITING)
-  requestedAt DateTime                    @default(now())
-  acceptedAt  DateTime?
-  cancelledAt DateTime?
-  rejectedAt  DateTime?
-  createdBy   String
-  links       Office365ReferralLink[]
-}
-
-model Office365ReferralLink {
-  id            String                @id @default(cuid())
-  request       Office365LinkRequest  @relation(fields: [requestId], references: [id])
-  email         String
-  activePeriod  String
-  numberOfUsers Int
-  link          String?
-  requestId     String
 }

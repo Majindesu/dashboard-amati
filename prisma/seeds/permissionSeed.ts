@@ -81,18 +81,6 @@ export default async function permissionSeed(prisma: PrismaClient) {
             description: "Allows deleting a user",
             isActive: true,
         },
-        {
-            code: "office-365-request.create",
-            name: "Create Office 365 Request",
-            description: "Allows create an Office 365 Reseller Request",
-            isActive: true
-        },
-        {
-            code: "office-365-request.getMine",
-            name: "Get my Office 365 Requests",
-            description: "Allows retrieve user's Office 365 Link Requests",
-            isActive: true
-        }
     ];
     
     await Promise.all(
