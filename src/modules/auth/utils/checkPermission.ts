@@ -1,6 +1,7 @@
 import getCurrentUser from "./getCurrentUser";
 import "server-only";
 import getUserPermissions from "./getUserPermissions";
+import { PermissionCode } from "@/modules/permission/data/initialPermissions";
 
 /**
  * Deprecated. Use dashboard service instead
@@ -12,7 +13,7 @@ import getUserPermissions from "./getUserPermissions";
  * @returns true if the user has the required permission, otherwise false.
  */
 export default async function checkPermission(
-	permission: "guest-only" | "authenticated-only" | "*" | (string & {}),
+	permission: "guest-only" | "authenticated-only" | "*" | PermissionCode | (string & {}),
 	currentUser?: Awaited<ReturnType<typeof getCurrentUser>>
 ): Promise<boolean> {
 	// Allow if no specific permission is required.
