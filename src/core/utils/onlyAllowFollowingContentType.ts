@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import BaseError from "../error/BaseError";
+import ContentType from "@/types/ContentType";
 
 /**
  * Ensures that the current request's content type is one of the allowed types.
@@ -9,7 +10,7 @@ import BaseError from "../error/BaseError";
  * @throws {BaseError} Throws a BaseError if the current request's content type is not in the allowed content types.
  */
 export default function onlyAllowFollowingContentType(
-	contentTypes: string | string[]
+	contentTypes: ContentType & (string | {}) | ContentType[] | (string | {})[]
 ) {
 	// Retrieve the current request's content type.
 	const currentContentType = headers().get("Content-Type");
