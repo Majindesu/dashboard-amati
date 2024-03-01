@@ -1,7 +1,8 @@
 import { cache } from "react"
 import "server-only"
 import getUserFromToken from "./getUserFromToken"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
+import getTokenFromHeaders from "./getTokenFromHeaders"
 
 /**
  * Retrieves the current user based on the JWT token stored in cookies.
@@ -13,7 +14,7 @@ import { cookies } from "next/headers"
  */
 const getCurrentUser = async () => {
     // Retrieve the token from cookies
-    const token = cookies().get("token")?.value;
+    const token = cookies().get("token")?.value ?? getTokenFromHeaders(headers());
 
     // If no token is found, return null (no current user)
     if(!token) return null;
