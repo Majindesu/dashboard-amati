@@ -6,7 +6,7 @@ import getCurrentUser from "@/modules/auth/utils/getCurrentUser";
  * Checks multiple permissions for the current user and returns an object indicating
  * whether each permission is granted.
  * 
- * Deprecated. Moved into Auth module
+ * Deprecated. Use `checkMultiplePermission()` from auth module instead.
  *
  * @deprecated
  * @param permissions - An object with keys as permission names and values as the required roles/permissions.

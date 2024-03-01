@@ -3,7 +3,10 @@ import "server-only";
 
 /**
  * Checks if the current user has the specified permissions.
+ * 
+ * Deprecated. Use `checkPermission()` from auth module instead.
  *
+ * @deprecated
  * @param permission - The specific permission to check. If it's "guest-only", the function returns true if the user is not authenticated. If it's "authenticated-only", it returns true if the user is authenticated. For other permissions, it checks against the user's roles and direct permissions.
  * @param currentUser - Optional. The current user object. If not provided, the function retrieves the current user.
  * @returns true if the user has the required permission, otherwise false.
