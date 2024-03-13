@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "check-env": "bun run ./env.ts",
-    "dev": "bun run check-env && bunx next dev",
-    "build": "bun run check-env && bunx next build",
-    "start": "bun run check-env && bunx next start",
-    "lint": "bunx next lint"
+    "check-env": "ts-node env.ts && run ./env.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

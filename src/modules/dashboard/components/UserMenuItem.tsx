@@ -1,9 +1,9 @@
 import { Menu, rem } from "@mantine/core";
 import React from "react";
-import { UserMenuItem } from "../types/UserMenuItem";
+import { UserMenuItem as UserMenuItemType } from "../types/UserMenuItem";
 
 interface Props {
-	item: UserMenuItem;
+	item: UserMenuItemType;
 }
 
 export default function UserMenuItem({ item }: Props) {

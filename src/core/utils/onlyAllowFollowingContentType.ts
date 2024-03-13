@@ -12,8 +12,8 @@ import ContentType from "@/types/ContentType";
 export default function onlyAllowFollowingContentType(
 	contentTypes: ContentType & (string | {}) | ContentType[] | (string | {})[]
 ) {
-	// Retrieve the current request's content type.
-	const currentContentType = headers().get("Content-Type");
+	// Retrieve the current request's content type and ignore any parameters.
+	const currentContentType = headers().get("Content-Type")?.split(';')[0].trim();
 
 	// Normalize the input parameter to an array to simplify the inclusion check.
 	const allowedContentTypes = Array.isArray(contentTypes)
