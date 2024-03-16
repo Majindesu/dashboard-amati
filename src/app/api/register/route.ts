@@ -1,8 +1,8 @@
 import BaseError from "@/core/error/BaseError";
 import applicationJsonOnly from "@/core/utils/applicationJsonOnly";
 import handleCatchApi from "@/core/utils/handleCatchApi";
+import nonAdminRegisterAction from "@/modules/auth/actions/nonAdminRegisterAction";
 import { createUserSchema } from "@/modules/auth/formSchemas/CreateUserFormSchema";
-import createUser from "@/modules/auth/services/createUser";
 import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,11 +24,10 @@ export async function POST(request: NextRequest) {
 			});
 		}
 
-		const result = await createUser({
+		const result = await nonAdminRegisterAction({
 			email: data.data.email,
 			name: data.data.name,
 			password: data.data.password,
-			passwordConfirmation: data.data.passwordConfirmation ?? "",
 		});
 
 		return NextResponse.json(result);

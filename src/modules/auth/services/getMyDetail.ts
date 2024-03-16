@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import getUserFromToken from "../utils/getUserFromToken";
 import AuthError from "../error/AuthError";
 
