@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
 
 		const result = await signIn(data.data)
 
+		request.cookies.set("token", result.token)
+
 		return NextResponse.json(result);
 	} catch (e) {
 		return handleCatchApi(e)
