@@ -35,10 +35,11 @@ export default async function getMyDetailAction(): Promise<ServerResponseAction<
 		if (e instanceof AuthError && e.errorCode === "INVALID_JWT_TOKEN") {
 			return {
 				success: false,
-				error: new BaseError({
-					errorCode: e.errorCode,
+				error: {
+					errorCode: "UNAUTHENTICATED",
 					message: "You are not authenticated",
-				}),
+				},
+				dashboardError: true
 			};
 		}
 		// Handle other types of errors.

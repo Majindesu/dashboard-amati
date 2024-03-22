@@ -1,5 +1,6 @@
 import ClientError from "@/core/error/ClientError";
 import ServerResponseAction from "../types/ServerResponseAction";
+import { error } from "console";
 
 /**
  * A higher-order function that wraps an async function and provides structured error handling.

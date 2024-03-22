@@ -1,11 +1,13 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import AppHeader from "./AppHeader";
 import AppNavbar from "./AppNavbar";
 import { useAuth } from "@/modules/auth/contexts/AuthContext";
+import { usePathname } from "next/navigation";
+import dashboardConfig from "../dashboard.config";
 
 interface Props {
 	children: React.ReactNode;
@@ -20,16 +22,25 @@ interface Props {
  * @returns A React element representing the dashboard layout.
  */
 export default function DashboardLayout(props: Props) {
+
+	const pathname = usePathname();
+
 	// State and toggle function for handling the disclosure of the navigation bar
 	const [openNavbar, { toggle }] = useDisclosure(false);
 
 	const {fetchUserData} = useAuth();
 
+	const [withAppShell, setWithAppShell] = useState(false)
+
 	useEffect(() => {
 		fetchUserData()
 	}, [fetchUserData])
 
-	return (
+	useEffect(() => {
+		setWithAppShell(!dashboardConfig.routesWithoutAppShell.some(v => `${dashboardConfig.baseRoute}${v}` === pathname))
+	}, [pathname])
+
+	return withAppShell ? (
 		<AppShell
 			padding="md"
 			header={{ height: 70 }}
@@ -49,5 +60,5 @@ export default function DashboardLayout(props: Props) {
 				{props.children}
 			</AppShell.Main>
 		</AppShell>
-	);
+	) : props.children;
 }

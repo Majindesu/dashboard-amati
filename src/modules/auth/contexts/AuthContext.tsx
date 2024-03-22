@@ -6,6 +6,7 @@ import React, { ReactElement, ReactNode, createContext, useCallback, useContext,
 import { notifications } from "@mantine/notifications";
 import getMyDetailAction from "../actions/getMyDetailAction";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
+import ClientError from "@/core/error/ClientError";
 
 // Defining the structure for user data within the authentication context.
 interface UserData {
@@ -48,6 +49,9 @@ export const AuthContextProvider = ({ children }: Props): ReactElement => {
         setUser(response.data);
       })
       .catch((error) => {
+        if (error instanceof ClientError){
+          if (error.errorCode === "UNAUTHENTICATED") return;
+        }
         notifications.show({
           title: 'Error',
           message: 'Error while retrieving user data',
