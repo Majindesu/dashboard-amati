@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useEffect, useState } from "react";
 import { AppShell } from "@mantine/core";
@@ -34,7 +35,7 @@ export default function DashboardLayout(props: Props) {
 
 	useEffect(() => {
 		fetchUserData()
-	}, [fetchUserData])
+	}, [])
 
 	useEffect(() => {
 		setWithAppShell(!dashboardConfig.routesWithoutAppShell.some(v => `${dashboardConfig.baseRoute}${v}` === pathname))
