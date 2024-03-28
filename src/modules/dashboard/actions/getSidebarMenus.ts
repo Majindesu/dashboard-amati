@@ -1,14 +1,6 @@
 "use server";
-import {
-	TbLayoutDashboard,
-	TbUsers,
-	TbNotebook,
-	TbShoppingBag,
-	TbPhotoFilled,
-} from "react-icons/tb";
 import SidebarMenu from "../types/SidebarMenu";
 import "server-only";
-import getCurrentUser from "@/modules/auth/utils/getCurrentUser";
 import ServerResponseAction from "../types/ServerResponseAction";
 import handleCatch from "../utils/handleCatch";
 import getUserRoles from "@/modules/auth/utils/getUserRoles";
@@ -38,6 +30,7 @@ export default async function getSidebarMenus(): Promise<
 						) ||
 						menuChild.allowedPermissions?.includes("*") ||
 						menuChild.allowedRoles?.includes("*")
+						|| roles.includes("super-admin")
 					)
 						currentMenuChildren.push(menuChild);
 				}

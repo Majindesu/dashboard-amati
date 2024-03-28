@@ -1,4 +1,3 @@
-import { cache } from "react"
 import "server-only"
 import getUserFromToken from "./getUserFromToken"
 import { cookies, headers } from "next/headers"

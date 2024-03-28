@@ -1,8 +1,5 @@
-import { AppShell, AppShellHeader, Burger, MantineProvider } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import Image from "next/image";
+import { MantineProvider } from "@mantine/core";
 import React from "react";
-import logo from "@/assets/logos/logo.png";
 import DashboardLayout from "@/modules/dashboard/components/DashboardLayout";
 import getUser from "@/modules/auth/actions/getMyDetailAction";
 import { redirect } from "next/navigation";

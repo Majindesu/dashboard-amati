@@ -12,5 +12,5 @@ import "server-only";
  */
 export default async function logout() {
 	cookies().delete("token");
-	redirect("/login");
+	redirect("/dashboard/login");
 }

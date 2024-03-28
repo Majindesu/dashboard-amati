@@ -14,7 +14,7 @@ const userMenuItems: UserMenuItem[] = [
 		label: "Logout",
 		icon: TbLogout,
 		color: "red",
-		href: "/logout",
+		href: "/dashboard/logout",
 	},
 ];
 

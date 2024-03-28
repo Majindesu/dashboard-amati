@@ -2,12 +2,10 @@
 
 import getMyDetail from "../services/getMyDetail";
 import AuthError from "../error/AuthError";
-import BaseError from "@/core/error/BaseError";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import "server-only";
 import { cookies } from "next/headers";
-import getUserFromToken from "../utils/getUserFromToken";
 
 /**
  * Asynchronously retrieves the authenticated user's details from a server-side context in a Next.js application.

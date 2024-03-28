@@ -84,7 +84,7 @@ const permissionData = [
     } 
 ] as const;
 
-export type PermissionCode = (typeof permissionData)[number]['code'];
+export type PermissionCode = (typeof permissionData)[number]['code'] | "*" | "authenticated-only" | "guest-only";
 
 const exportedPermissionData = permissionData as unknown as Omit<Permission, "id">[];
 

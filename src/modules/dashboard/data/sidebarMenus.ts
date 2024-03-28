@@ -14,7 +14,7 @@ const sidebarMenus: SidebarMenu[] = [
 			{
 				label: "Users",
 				link: "/users",
-				allowedPermissions: ["users.getAll"],
+				allowedPermissions: ["users.readAll"],
 			},
 			{ label: "Roles", link: "/roles", allowedRoles: ["super-admin"] },
 			{
@@ -24,24 +24,6 @@ const sidebarMenus: SidebarMenu[] = [
 			},
 		],
 	},
-	{
-		label: "Reseller Office 365",
-		icon: "TbBuildingStore",
-		color: "red",
-		allowedPermissions: ["*"],
-		children: [
-			{
-				label: "My Request Links",
-				link: "/reseller-office-365/request",
-				allowedRoles: ["reseller-office-365"]
-			},
-			{
-				label: "Process Request Link",
-				link: "/reseller-office-365/list",
-				allowedRoles: ["admin-reseller-office-365"]
-			}
-		]
-	}
 ];
 
 export default sidebarMenus;

@@ -2,6 +2,7 @@ import getCurrentUser from "./getCurrentUser";
 import "server-only";
 import getUserPermissions from "./getUserPermissions";
 import { PermissionCode } from "@/modules/permission/data/initialPermissions";
+import AuthError from "../error/AuthError";
 
 /**
  * Deprecated. Use dashboard service instead
@@ -12,31 +13,38 @@ import { PermissionCode } from "@/modules/permission/data/initialPermissions";
  * @returns true if the user has the required permission, otherwise false.
  */
 export default async function checkPermission(
-	permission: "guest-only" | "authenticated-only" | "*" | PermissionCode | (string & {}),
+	permission: PermissionCode,
 	currentUser?: Awaited<ReturnType<typeof getCurrentUser>>
 ): Promise<boolean> {
-	// Allow if no specific permission is required.
-	if (permission === "*") return true;
+	try {
+		// Allow if no specific permission is required.
+		if (permission === "*") return true;
 
-	// Retrieve current user if not provided.
-	const user = currentUser ?? (await getCurrentUser());
+		// Retrieve current user if not provided.
+		const user = currentUser ?? (await getCurrentUser());
 
-	// Handle non-authenticated users.
-	if (!user) {
-		return permission === "guest-only";
+		// Handle non-authenticated users.
+		if (!user) {
+			return permission === "guest-only";
+		}
+
+		// Allow authenticated users if the permission is 'authenticated-only'.
+		if (permission === "authenticated-only") {
+			return true;
+		}
+
+		// Short-circuit for super-admin role to allow all permissions.
+		if (user.roles.some((role) => role.code === "super-admin")) return true;
+
+		// Aggregate all role codes and direct permissions into a set for efficient lookup.
+		const permissions = await getUserPermissions();
+
+		// Check if the user has the required permission.
+		return permissions.includes(permission);
+	} catch (e) {
+		if (e instanceof AuthError && e.errorCode === "INVALID_JWT_TOKEN") {
+			return false;
+		}
+		throw e;
 	}
-
-	// Allow authenticated users if the permission is 'authenticated-only'.
-	if (permission === "authenticated-only") {
-		return true;
-	}
-
-	// Short-circuit for super-admin role to allow all permissions.
-	if (user.roles.some((role) => role.code === "super-admin")) return true;
-
-	// Aggregate all role codes and direct permissions into a set for efficient lookup.
-	const permissions = await getUserPermissions()
-
-	// Check if the user has the required permission.
-	return permissions.includes(permission);
 }
