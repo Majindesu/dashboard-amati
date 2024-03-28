@@ -6,9 +6,7 @@ import {
 	Group,
 	ThemeIcon,
 	UnstyledButton,
-	alpha,
 	rem,
-	useMantineTheme,
 } from "@mantine/core";
 import { TbChevronRight } from "react-icons/tb";
 import * as TbIcons from "react-icons/tb";
@@ -36,8 +34,6 @@ export default function MenuItem({ menu }: Props) {
 	const hasChildren = Array.isArray(menu.children);
 
 	const pathname = usePathname()
-
-	const theme = useMantineTheme();
 
 	const [opened, setOpened] = useState(menu.children?.some(child => areURLsSame(`${dashboardConfig.baseRoute}${child.link}`, pathname)) ?? false);
 
