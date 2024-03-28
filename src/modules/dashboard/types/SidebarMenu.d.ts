@@ -7,10 +7,11 @@ export default interface SidebarMenu {
 	children?: {
 		label: string;
 		link: string;
-		allowedPermissions?: PermissionCode[],
-		allowedRoles?: RoleCode[],
+		allowedPermissions?: PermissionCode[];
+		allowedRoles?: RoleCode[];
 	}[];
+	link?: string;
 	color?: ThemeIconProps["color"];
-	allowedPermissions?: PermissionCode[],
-	allowedRoles?: RoleCode[]
+	allowedPermissions?: PermissionCode[];
+	allowedRoles?: RoleCode[];
 }

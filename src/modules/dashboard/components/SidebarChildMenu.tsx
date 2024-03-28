@@ -4,9 +4,11 @@ import { Text } from "@mantine/core";
 
 import classNames from "./styles/sidebarChildMenu.module.css";
 import SidebarMenu from "../types/SidebarMenu";
+import dashboardConfig from "../dashboard.config";
 
 interface Props {
 	item: NonNullable<SidebarMenu["children"]>[number];
+	active: boolean;
 }
 
 /**
@@ -26,7 +28,8 @@ export default function ChildMenu(props: Props) {
 		<Text<"a">
 			component="a"
 			className={classNames.link}
-			href={`/dashboard${linkPath}`}
+			href={`${dashboardConfig.baseRoute}${linkPath}`}
+			fw={props.active ? "bold" : "normal"}
 		>
 			{props.item.label}
 		</Text>

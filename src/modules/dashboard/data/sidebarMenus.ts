@@ -5,6 +5,7 @@ const sidebarMenus: SidebarMenu[] = [
 		label: "Dashboard",
 		icon: "TbLayoutDashboard",
 		allowedPermissions: ["*"],
+		link: "/",
 	},
 	{
 		label: "Users",

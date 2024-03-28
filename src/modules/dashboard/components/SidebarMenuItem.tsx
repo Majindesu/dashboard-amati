@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 
 import {
 	Box,
@@ -6,7 +6,9 @@ import {
 	Group,
 	ThemeIcon,
 	UnstyledButton,
+	alpha,
 	rem,
+	useMantineTheme,
 } from "@mantine/core";
 import { TbChevronRight } from "react-icons/tb";
 import * as TbIcons from "react-icons/tb";
@@ -14,6 +16,9 @@ import * as TbIcons from "react-icons/tb";
 import ChildMenu from "./SidebarChildMenu";
 import classNames from "./styles/sidebarMenuItem.module.css";
 import SidebarMenu from "../types/SidebarMenu";
+import dashboardConfig from "../dashboard.config";
+import { usePathname } from "next/navigation";
+import areURLsSame from "@/utils/areUrlSame";
 
 interface Props {
 	menu: SidebarMenu;
@@ -30,7 +35,11 @@ interface Props {
 export default function MenuItem({ menu }: Props) {
 	const hasChildren = Array.isArray(menu.children);
 
-	const [opened, setOpened] = useState(false);
+	const pathname = usePathname()
+
+	const theme = useMantineTheme();
+
+	const [opened, setOpened] = useState(menu.children?.some(child => areURLsSame(`${dashboardConfig.baseRoute}${child.link}`, pathname)) ?? false);
 
 	const toggleOpenMenu = () => {
 		setOpened((prev) => !prev);
@@ -38,20 +47,23 @@ export default function MenuItem({ menu }: Props) {
 
 	// Mapping children menu items if available
 	const subItems = (hasChildren ? menu.children! : []).map((child, index) => (
-		<ChildMenu key={index} item={child} />
+		<ChildMenu key={index} item={child} active={areURLsSame(`${dashboardConfig.baseRoute}${child.link}`, pathname)} />
 	));
 
 	const Icons = TbIcons as any;
 
 	const Icon = typeof menu.icon === "string" ? Icons[menu.icon] : menu.icon;
-	// const a = typeof menu.icon === "string"
+
+	const isActive = areURLsSame(`${dashboardConfig.baseRoute}${menu.link}`, pathname)
 
 	return (
 		<>
 			{/* Main Menu Item */}
-			<UnstyledButton
+			<UnstyledButton<"a" | "button">
 				onClick={toggleOpenMenu}
 				className={classNames.control}
+				href={menu.link ? dashboardConfig.baseRoute + menu.link : ""}
+				component={menu.link ? "a" : "button"}
 			>
 				<Group justify="space-between" gap={0}>
 					{/* Icon and Label */}
@@ -60,7 +72,7 @@ export default function MenuItem({ menu }: Props) {
 							<Icon style={{ width: rem(18), height: rem(18) }} />
 						</ThemeIcon>
 
-						<Box ml="md">{menu.label}</Box>
+						<Box ml="md" fw={isActive ? 700 : 500}>{menu.label}</Box>
 					</Box>
 
 					{/* Chevron Icon for collapsible items */}
