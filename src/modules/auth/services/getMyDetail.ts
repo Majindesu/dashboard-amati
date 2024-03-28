@@ -5,7 +5,10 @@ import AuthError from "../error/AuthError";
  * Retrieves the details of the currently authenticated user based on the JWT token.
  * If the token is not present or the user cannot be found, it returns null.
  * Otherwise, it returns the user's name, email, and photo URL.
+ * 
+ * Deprecated. use getCurrentUser() instead (see getCurrentUser.ts)
  *
+ * @deprecated
  * @returns An object containing the user's name, email, and photo URL, or null if the user cannot be authenticated.
  */
 export default async function getMyDetail(token?: string) {

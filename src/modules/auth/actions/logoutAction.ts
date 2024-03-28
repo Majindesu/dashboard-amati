@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import "server-only";
@@ -12,5 +13,6 @@ import "server-only";
  */
 export default async function logout() {
 	cookies().delete("token");
+	revalidatePath("/dashboard/login");
 	redirect("/dashboard/login");
 }

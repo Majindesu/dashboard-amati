@@ -1,17 +1,15 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import AppHeader from "./AppHeader";
 import AppNavbar from "./AppNavbar";
-import { useAuth } from "@/modules/auth/contexts/AuthContext";
 import { usePathname } from "next/navigation";
-import dashboardConfig from "../dashboard.config";
 
 interface Props {
 	children: React.ReactNode;
+	isLoggedIn: boolean
 }
 
 /**
@@ -24,22 +22,14 @@ interface Props {
  */
 export default function DashboardLayout(props: Props) {
 
+	
 	const pathname = usePathname();
-
+	
+	console.log(pathname)
 	// State and toggle function for handling the disclosure of the navigation bar
 	const [openNavbar, { toggle }] = useDisclosure(false);
 
-	const {fetchUserData} = useAuth();
-
-	const [withAppShell, setWithAppShell] = useState(false)
-
-	useEffect(() => {
-		fetchUserData()
-	}, [])
-
-	useEffect(() => {
-		setWithAppShell(!dashboardConfig.routesWithoutAppShell.some(v => `${dashboardConfig.baseRoute}${v}` === pathname))
-	}, [pathname])
+	const withAppShell = props.isLoggedIn;
 
 	return withAppShell ? (
 		<AppShell

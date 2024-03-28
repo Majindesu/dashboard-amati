@@ -1,25 +1,36 @@
 import { MantineProvider } from "@mantine/core";
 import React from "react";
 import DashboardLayout from "@/modules/dashboard/components/DashboardLayout";
-import getUser from "@/modules/auth/actions/getMyDetailAction";
-import { redirect } from "next/navigation";
 import { Notifications } from "@mantine/notifications";
+import getCurrentUser from "@/modules/auth/services/getCurrentUser";
+import { AuthContextProvider } from "@/modules/auth/contexts/AuthContext";
+import getSidebarMenus from "@/modules/dashboard/services/getSidebarMenus";
 
 interface Props {
 	children: React.ReactNode;
 }
 
 export default async function Layout(props: Props) {
-	const user = await getUser();
+	const user = (await getCurrentUser());
 
-	if (!user) {
-		redirect("/login");
-	}
+	// if (!user) {
+	// 	redirect("/dashboard/login");
+	// }
+
+	const userData = user ? {
+		id: user.id,
+		name: user.name ?? "",
+		email: user.email ?? "",
+		photoProfile: user.photoProfile,
+		sidebarMenus: await getSidebarMenus()
+	} : null;
 
 	return (
 		<MantineProvider>
 			<Notifications />
-			<DashboardLayout>{props.children}</DashboardLayout>
+			<AuthContextProvider userData={userData}>
+				<DashboardLayout isLoggedIn={!!user}>{props.children}</DashboardLayout>
+			</AuthContextProvider>
 		</MantineProvider>
 	);
 }

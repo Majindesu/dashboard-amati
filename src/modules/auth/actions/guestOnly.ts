@@ -1,8 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import getMyDetail from "../services/getMyDetail";
-import { cookies } from "next/headers";
+import getCurrentUser from "../services/getCurrentUser";
 
 /**
  * Enforces a guest-only access policy by redirecting authenticated users to the dashboard.
@@ -12,11 +11,7 @@ import { cookies } from "next/headers";
  * @returns A promise that resolves when the operation completes. The function itself does not return a value.
  */
 export default async function guestOnly(): Promise<void> {
-	const token = cookies().get("token");
-
-	if (!token) return;
-
-	const user = await getMyDetail(token.value);
+	const user = await getCurrentUser();
 
 	// If an authenticated user is detected, redirect them to the dashboard.
 	if (user) {

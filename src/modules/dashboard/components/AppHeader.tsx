@@ -64,7 +64,7 @@ export default function AppHeader(props: Props) {
 						>
 							<Group gap={7}>
 								<Avatar
-									src={user?.photoUrl}
+									src={user?.photoProfile}
 									alt={user?.name}
 									radius="xl"
 									size={20}
