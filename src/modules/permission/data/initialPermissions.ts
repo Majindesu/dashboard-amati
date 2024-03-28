@@ -53,6 +53,12 @@ const permissionData = [
 	},
 	// User group
 	{
+		code: "users.create",
+		name: "Create user",
+		description: "Allows creating a user",
+		isActive: true,
+	},
+	{
 		code: "users.read",
 		name: "Read user",
 		description: "Allows reading a single user",

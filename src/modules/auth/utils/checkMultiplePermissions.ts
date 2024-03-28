@@ -17,7 +17,6 @@ async function checkMultiplePermissions<
 		| "authenticated-only"
 		| "*"
 		| PermissionCode
-		| (string & {})
 	>
 >(permissions: T): Promise<{ [K in keyof T]: boolean }> {
 	const permissionResults: Partial<{ [K in keyof T]: boolean }> = {};

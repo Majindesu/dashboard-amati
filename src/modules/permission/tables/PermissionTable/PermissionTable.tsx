@@ -1,15 +1,12 @@
 "use client";
 import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
-import { Table, Text, Flex, Button, Center } from "@mantine/core";
+import { Text, Flex, Button } from "@mantine/core";
 import {
-	flexRender,
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
 import React, { useState } from "react";
 import { TbPlus } from "react-icons/tb";
-import getPermissions from "../../actions/getAllPermissions";
-import getAllPermissions from "../../actions/getAllPermissions";
 import FormModal, { ModalProps } from "../../modals/PermissionFormModal";
 import DeleteModal, { DeleteModalProps } from "../../modals/PermissionDeleteModal";
 import Permission from "../../types/Permission";

@@ -1,15 +1,13 @@
 "use client";
 import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
-import { Table, Text, Flex, Button, Center } from "@mantine/core";
-import {
-	flexRender,
-	getCoreRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
-import React, { useState } from "react";
+import { Text, Flex, Button } from "@mantine/core";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import React, { useMemo, useState } from "react";
 import { TbPlus } from "react-icons/tb";
 import UserFormModal, { ModalProps } from "../../modals/UserFormModal";
-import UserDeleteModal, { DeleteModalProps } from "../../modals/UserDeleteModal";
+import UserDeleteModal, {
+	DeleteModalProps,
+} from "../../modals/UserDeleteModal";
 import createColumns from "./columns";
 import getAllUsers from "../../actions/getAllUsers";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
@@ -20,7 +18,9 @@ interface Props {
 }
 
 export default function UsersTable(props: Props) {
+
 	const [modalProps, setModalProps] = useState<ModalProps>({
+		id: "",
 		opened: false,
 		title: "",
 	});
@@ -31,8 +31,16 @@ export default function UsersTable(props: Props) {
 		data: undefined,
 	});
 
+	const userData = useMemo(
+		() => props.userData.map((data) => ({
+			...data,
+			roles: data.roles.map((x) => x.name),
+		})),
+		[props.userData]
+	);
+
 	const table = useReactTable({
-		data: props.userData.map(data => ({...data, roles: data.roles.map(x => x.name)})),
+		data: userData,
 		columns: createColumns({
 			permissions: props.permissions,
 			actions: {
@@ -111,7 +119,7 @@ export default function UsersTable(props: Props) {
 					</Button>
 				)}
 			</Flex>
-			
+
 			<DashboardTable table={table} />
 
 			<UserFormModal {...modalProps} onClose={closeModal} />

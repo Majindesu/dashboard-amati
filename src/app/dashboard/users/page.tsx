@@ -2,8 +2,8 @@ import { Card, Stack, Title } from "@mantine/core";
 import React from "react";
 import getUsers from "@/modules/userManagement/actions/getAllUsers";
 import { Metadata } from "next";
-import checkMultiplePermissions from "@/modules/dashboard/services/checkMultiplePermissions";
 import UsersTable from "@/modules/userManagement/tables/UsersTable/UsersTable";
+import checkMultiplePermissions from "@/modules/auth/utils/checkMultiplePermissions";
 
 export const metadata: Metadata = {
 	title: "Users - Dashboard",
@@ -14,9 +14,9 @@ export default async function UsersPage() {
 	const permissions = await checkMultiplePermissions({
 		create: "users.create",
 		readAll: "users.readAll",
-		read: "permission.read",
-		update: "permission.update",
-		delete: "permission.delete",
+		read: "users.read",
+		update: "users.update",
+		delete: "users.delete",
 	});
 
 	const users = await getUsers();

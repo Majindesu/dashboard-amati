@@ -73,7 +73,7 @@ const createColumns = (options: ColumnOptions) => {
 		columnHelper.display({
 			id: "status",
 			header: "Status",
-			cell: (props) => <Badge color="green">Active</Badge>,
+			cell: () => <Badge color="green">Active</Badge>,
 		}),
 
 		columnHelper.display({
