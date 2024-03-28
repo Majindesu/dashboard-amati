@@ -1,7 +1,5 @@
 //TODO: Change into server action
-import { ThemeIconProps } from "@mantine/core";
-import React from "react";
-import { TbLogout, TbSettings } from "react-icons/tb";
+import { TbLogout } from "react-icons/tb";
 import { UserMenuItem } from "../types/UserMenuItem";
 
 // This function retrieves the list of user menu items for use in the application's header.

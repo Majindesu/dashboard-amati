@@ -9,12 +9,11 @@ import {
 	Text,
 	rem,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import Image from "next/image";
 import logo from "@/assets/logos/logo-dsg.png";
 import cx from "clsx";
 import classNames from "./styles/appHeader.module.css";
-import { TbChevronDown, TbLogout, TbSettings } from "react-icons/tb";
+import { TbChevronDown } from "react-icons/tb";
 import getUserMenus from "../actions/getUserMenus";
 import { useAuth } from "@/modules/auth/contexts/AuthContext";
 import UserMenuItem from "./UserMenuItem";
