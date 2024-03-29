@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { showNotification } from "@/utils/notifications";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
-import deleteUser from "../actions/deleteUser";
+import deleteUserAction from "../actions/deleteUserAction";
 import ClientError from "@/core/error/ClientError";
 
 export interface DeleteModalProps {
@@ -38,7 +38,7 @@ export default function UserDeleteModal(props: DeleteModalProps) {
 		if (!props.data?.id) return;
 		setSubmitting(true);
 
-		withServerAction(() => deleteUser(props.data!.id))
+		withServerAction(deleteUserAction, props.data!.id)
 			.then((response) => {
 				showNotification(
 					response.message ?? "User deleted successfully"

@@ -9,12 +9,12 @@ import UserDeleteModal, {
 	DeleteModalProps,
 } from "../../modals/UserDeleteModal";
 import createColumns from "./columns";
-import getAllUsers from "../../actions/getAllUsers";
+import getAllUsers from "../../services/getAllUsers";
 import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	userData: Awaited<ReturnType<typeof getAllUsers>>;
+	data: Awaited<ReturnType<typeof getAllUsers>>;
 }
 
 export default function UsersTable(props: Props) {
@@ -32,11 +32,11 @@ export default function UsersTable(props: Props) {
 	});
 
 	const userData = useMemo(
-		() => props.userData.map((data) => ({
+		() => props.data.map((data) => ({
 			...data,
 			roles: data.roles.map((x) => x.name),
 		})),
-		[props.userData]
+		[props.data]
 	);
 
 	const table = useReactTable({

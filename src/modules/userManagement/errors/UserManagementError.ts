@@ -8,6 +8,7 @@ interface UserManagementErrorOptions {
 	message?: string;
 	errorCode: (typeof UserManagementErrorCodes)[number] | (string & {});
 	formErrors?: Record<string, string>
+	statusCode?: number;
 }
 
 export default class UserManagementError extends DashboardError {
@@ -18,6 +19,7 @@ export default class UserManagementError extends DashboardError {
 		super({
 			errorCode: options.errorCode,
 			message: options.message,
+			statusCode: options.statusCode,
 		});
 
 		this.errorCode = options.errorCode;

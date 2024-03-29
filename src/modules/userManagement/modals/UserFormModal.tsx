@@ -21,9 +21,9 @@ import { TbDeviceFloppy } from "react-icons/tb";
 import userFormDataSchema, {
 	UserFormData,
 } from "../formSchemas/userFormSchema";
-import getUserDetailById from "../actions/getUserDetailById";
+import getUserDetailById from "../actions/getUserDetailByIdAction";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
-import upsertUser from "../actions/upsertUser";
+import upsertUserAction from "../actions/upsertUserAction";
 import ClientError from "@/core/error/ClientError";
 import stringToColorHex from "@/core/utils/stringToColorHex";
 import getAllRoles from "@/modules/role/actions/getAllRoles";
@@ -112,7 +112,7 @@ export default function UserFormModal(props: ModalProps) {
 
 	const handleSubmit = (values: UserFormData) => {
 		setSubmitting(true);
-		withServerAction(upsertUser, values)
+		withServerAction(upsertUserAction, values)
 			.then((response) => {
 				showNotification(response.message!, "success");
 				closeModal();

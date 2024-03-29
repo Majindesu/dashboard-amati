@@ -1,6 +1,6 @@
 import { Card, Stack, Title } from "@mantine/core";
 import React from "react";
-import getUsers from "@/modules/userManagement/actions/getAllUsers";
+import getUsers from "@/modules/userManagement/services/getAllUsers";
 import { Metadata } from "next";
 import UsersTable from "@/modules/userManagement/tables/UsersTable/UsersTable";
 import checkMultiplePermissions from "@/modules/auth/utils/checkMultiplePermissions";
@@ -25,7 +25,7 @@ export default async function UsersPage() {
 		<Stack>
 			<Title order={1}>Users</Title>
 			<Card>
-				<UsersTable permissions={permissions} userData={users} />
+				<UsersTable permissions={permissions} data={users} />
 			</Card>
 		</Stack>
 	);

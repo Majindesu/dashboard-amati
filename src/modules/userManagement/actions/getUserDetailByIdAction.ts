@@ -1,10 +1,8 @@
 "use server";
-import "server-only";
-import prisma from "@/db";
-import checkPermission from "@/modules/dashboard/services/checkPermission";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
-import db from "@/core/db";
+import getUserById from "../services/getUserById";
+import checkPermission from "@/modules/auth/utils/checkPermission";
 
 type UserData = {
 	id: string;
@@ -23,35 +21,14 @@ type UserData = {
  * @param id The unique identifier of the user.
  * @returns The user's detailed information or an error response.
  */
-export default async function getUserDetailById(
+export default async function getUserDetailByIdAction(
 	id: string
 ): Promise<ServerResponseAction<UserData>> {
 	// Check user permission
 	if (!checkPermission("users.read")) return unauthorized();
 
 	// Retrieve user data from the database
-	const user = await db.user.findFirst({
-		where: { id },
-		select: {
-			id: true,
-			email: true,
-			name: true,
-			photoProfile: true,
-			roles: {
-				select: {
-					code: true,
-					name: true,
-				},
-			},
-		},
-	});
-
-	// Check if user exists
-	if (!user)
-		return {
-			success: false,
-			message: "User not found",
-		} as const;
+	const user = await getUserById(id)
 
 	// Format user data
 	const formattedUser = {
@@ -64,7 +41,6 @@ export default async function getUserDetailById(
 
 	return {
 		success: true,
-		message: "Permission fetched successfully",
 		data: formattedUser,
 	} as const;
 }

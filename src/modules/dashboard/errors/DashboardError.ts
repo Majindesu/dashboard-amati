@@ -14,6 +14,7 @@ interface DashboardErrorOptions {
 	message?: string;
 	errorCode: (typeof DashboardErrorCodes)[number] | (string & {});
 	formErrors?: Record<string, string>
+	statusCode?: number;
 }
 
 export default class DashboardError extends BaseError {
@@ -24,6 +25,7 @@ export default class DashboardError extends BaseError {
 		super({
 			errorCode: options.errorCode,
 			message: options.message,
+			statusCode: options.statusCode,
 		});
 
 		this.errorCode = options.errorCode;
