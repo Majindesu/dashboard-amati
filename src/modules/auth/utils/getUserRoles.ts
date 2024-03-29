@@ -1,4 +1,4 @@
-import { RoleCode } from "@/modules/permission/data/initialRoles";
+import { RoleCode } from "@/modules/role/data/initialRoles";
 import getCurrentUser from "./getCurrentUser";
 
 export default async function getUserRoles(): Promise<RoleCode[]> {

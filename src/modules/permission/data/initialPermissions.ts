@@ -3,6 +3,12 @@ import { Permission } from "@prisma/client";
 const permissionData = [
 	// Permission group
 	{
+		code: "permissions.create",
+		name: "Create permission",
+		description: "Allows creating a single permission",
+		isActive: true,
+	},
+	{
 		code: "permissions.read",
 		name: "Read permission",
 		description: "Allows reading a single permission",
@@ -27,6 +33,12 @@ const permissionData = [
 		isActive: true,
 	},
 	// Role group
+	{
+		code: "roles.create",
+		name: "Create role",
+		description: "Allows creating a single role",
+		isActive: true,
+	},
 	{
 		code: "roles.read",
 		name: "Read role",

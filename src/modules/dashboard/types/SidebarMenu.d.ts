@@ -1,5 +1,5 @@
 import { PermissionCode } from "@/modules/permission/data/initialPermissions";
-import { RoleCode } from "@/modules/permission/data/initialRoles";
+import { RoleCode } from "@/modules/role/data/initialRoles";
 
 export default interface SidebarMenu {
 	label: string;

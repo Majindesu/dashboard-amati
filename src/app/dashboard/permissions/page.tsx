@@ -1,4 +1,4 @@
-import checkMultiplePermissions from "@/modules/dashboard/services/checkMultiplePermissions";
+import checkMultiplePermissions from "@/modules/auth/utils/checkMultiplePermissions";
 import getAllPermissions from "@/modules/permission/actions/getAllPermissions";
 import PermissionsTable from "@/modules/permission/tables/PermissionTable/PermissionTable";
 import { Card, Stack, Title } from "@mantine/core";
@@ -20,11 +20,11 @@ export const metadata: Metadata = {
 
 export default async function RolesPage({ searchParams }: Props) {
 	const permissions = await checkMultiplePermissions({
-		create: "permission.create",
-		readAll: "permission.readAll",
-		read: "permission.read",
-		update: "permission.update",
-		delete: "permission.delete",
+		create: "permissions.create",
+		readAll: "permissions.readAll",
+		read: "permissions.read",
+		update: "permissions.update",
+		delete: "permissions.delete",
 	});
 	
 	const res = await getAllPermissions();
