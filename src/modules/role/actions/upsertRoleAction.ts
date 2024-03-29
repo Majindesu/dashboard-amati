@@ -1,13 +1,10 @@
 "use server";
 
-import roleFormDataSchema, { RoleFormData } from "../formSchemas/RoleFormData";
-import mapObjectToFirstValue from "@/utils/mapObjectToFirstValue";
+import { RoleFormData } from "../formSchemas/RoleFormData";
 import { revalidatePath } from "next/cache";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
-import DashboardError from "@/modules/dashboard/errors/DashboardError";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
-import db from "@/core/db";
 import checkPermission from "@/modules/auth/utils/checkPermission";
 import upsertRole from "../services/upsertRole";
 
