@@ -1,4 +1,4 @@
-import checkPermission from "@/modules/dashboard/services/checkPermission";
+import checkPermission from "./checkPermission";
 import getCurrentUser from "./getCurrentUser";
 import { PermissionCode } from "@/modules/permission/data/initialPermissions";
 

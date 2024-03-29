@@ -26,7 +26,7 @@ import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import upsertUserAction from "../actions/upsertUserAction";
 import ClientError from "@/core/error/ClientError";
 import stringToColorHex from "@/core/utils/stringToColorHex";
-import getAllRoles from "@/modules/role/actions/getAllRoles";
+import getAllRolesAction from "@/modules/role/actions/getAllRolesAction";
 import Role from "@/modules/role/types/Role";
 
 export interface ModalProps {
@@ -96,7 +96,7 @@ export default function UserFormModal(props: ModalProps) {
 
 	// Fetch Roles
 	useEffect(() => {
-		withServerAction(getAllRoles)
+		withServerAction(getAllRolesAction)
 			.then((response) => {
 				setRoles(response.data);
 			})

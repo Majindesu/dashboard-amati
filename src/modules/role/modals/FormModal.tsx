@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
 import roleFormDataSchema, { RoleFormData } from "../formSchemas/RoleFormData";
-import getAllPermissions from "@/modules/permission/actions/getAllPermissions";
+import getAllPermissionsAction from "@/modules/permission/actions/getAllPermissionsAction";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
 import getRoleByIdAction from "../actions/getRoleByIdAction";
 import upsertRoleAction from "../actions/upsertRoleAction";
@@ -67,7 +67,7 @@ export default function FormModal(props: ModalProps) {
 	//Fetch Permissions
 	useEffect(() => {
 		setFetching(true);
-		withServerAction(getAllPermissions)
+		withServerAction(getAllPermissionsAction)
 			.then((response) => {
 				setAllPermissions(response.data);
 			})
