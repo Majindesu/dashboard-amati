@@ -1,4 +1,3 @@
-import cookieConfig from "@/config/cookie";
 import { NotificationData, notifications } from "@mantine/notifications";
 
 export type NotificationType = "success" | "error";

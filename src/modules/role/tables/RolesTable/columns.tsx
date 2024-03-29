@@ -1,9 +1,7 @@
 import CrudPermissions from "@/modules/dashboard/types/CrudPermissions";
 import createActionButtons from "@/modules/dashboard/utils/createActionButton";
-import { Badge, Flex, Tooltip, ActionIcon } from "@mantine/core";
+import { Badge, Flex } from "@mantine/core";
 import { createColumnHelper } from "@tanstack/react-table";
-import Link from "next/link";
-import { StringifyOptions } from "querystring";
 import { TbEye, TbPencil, TbTrash } from "react-icons/tb";
 
 export interface RoleRow {
