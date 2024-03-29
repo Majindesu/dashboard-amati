@@ -1,24 +1,15 @@
 import checkMultiplePermissions from "@/modules/auth/utils/checkMultiplePermissions";
-import getAllPermissions from "@/modules/permission/actions/getAllPermissions";
+import getAllPermissions from "@/modules/permission/services/getAllPermissions";
 import PermissionsTable from "@/modules/permission/tables/PermissionTable/PermissionTable";
 import { Card, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import React from "react";
 
-interface Props {
-	searchParams: {
-		detail?: string;
-		edit?: string;
-		delete?: string;
-		create?: string;
-	};
-}
-
 export const metadata: Metadata = {
 	title: "Permissions - Dashboard",
 };
 
-export default async function RolesPage({ searchParams }: Props) {
+export default async function RolesPage() {
 	const permissions = await checkMultiplePermissions({
 		create: "permissions.create",
 		readAll: "permissions.readAll",
@@ -27,14 +18,13 @@ export default async function RolesPage({ searchParams }: Props) {
 		delete: "permissions.delete",
 	});
 	
-	const res = await getAllPermissions();
-	if (!res.success) throw new Error("Error while fetch permission");
+	const permissionsData = await getAllPermissions();
     
 	return (
 		<Stack>
 			<Title order={1}>Permissions</Title>
 			<Card>
-                <PermissionsTable permissions={permissions} permissionData={res.data} />
+                <PermissionsTable permissions={permissions} data={permissionsData} />
 			</Card>
 		</Stack>
 	);

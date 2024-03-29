@@ -1,11 +1,10 @@
 "use server";
 
-import db from "@/core/db";
-import prisma from "@/db";
-import checkPermission from "@/modules/dashboard/services/checkPermission";
+import checkPermission from "@/modules/auth/utils/checkPermission";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
+import getPermissionById from "../services/getPermissionById";
 
 interface Permission {
 	id: string;
@@ -15,33 +14,16 @@ interface Permission {
 	isActive: boolean;
 }
 
-export default async function getPermissionById(
+export default async function getPermissionByIdAction(
 	id: string
 ): Promise<ServerResponseAction<Permission>> {
 	try {
 		if (!(await checkPermission("permissions.read"))) unauthorized();
 
-		const permission = await db.permission.findFirst({
-			where: { id },
-			select: {
-				code: true,
-				description: true,
-				id: true,
-				isActive: true,
-				name: true,
-			},
-		});
-
-		if (!permission) {
-			return {
-				success: false,
-				message: "Permission not found",
-			} as const;
-		}
+		const permission = await getPermissionById(id);
 
 		return {
 			success: true,
-			message: "Permission fetched successfully",
 			data: permission,
 		} as const;
 	} catch (e) {

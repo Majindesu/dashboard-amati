@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { showNotification } from "@/utils/notifications";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
-import deletePermission from "../actions/deletePermission";
+import deletePermissionAction from "../actions/deletePermissionAction";
 import ClientError from "@/core/error/ClientError";
 
 export interface DeleteModalProps {
@@ -37,7 +37,7 @@ export default function DeleteModal(props: DeleteModalProps) {
 		if (!props.data?.id) return;
 		setSubmitting(true);
 
-		withServerAction(deletePermission, props.data!.id)
+		withServerAction(deletePermissionAction, props.data!.id)
 			.then((response) => {
 				showNotification(
 					response.message ?? "Permission deleted successfully"

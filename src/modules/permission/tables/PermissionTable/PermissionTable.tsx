@@ -15,7 +15,7 @@ import DashboardTable from "@/modules/dashboard/components/DashboardTable";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	permissionData: Permission[];
+	data: Permission[];
 }
 
 export default function PermissionsTable(props: Props) {
@@ -31,7 +31,7 @@ export default function PermissionsTable(props: Props) {
 	});
 
 	const table = useReactTable({
-		data: props.permissionData,
+		data: props.data,
 		columns: createColumns({
 			permissions: props.permissions,
 			actions: {

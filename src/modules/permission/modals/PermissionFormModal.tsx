@@ -17,9 +17,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { TbDeviceFloppy } from "react-icons/tb";
 import permissionFormDataSchema, { PermissionFormData } from "../formSchemas/PermissionFormData";
-import getPermissionById from "../actions/getPermissionById";
+import getPermissionByIdAction from "../actions/getPermissionByIdAction";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
-import upsertPermission from "../actions/upsertPermission";
+import upsertPermissionAction from "../actions/upsertPermissionAction";
 import ClientError from "@/core/error/ClientError";
 
 export interface ModalProps {
@@ -66,7 +66,7 @@ export default function FormModal(props: ModalProps) {
 		}
 
 		setFetching(true);
-		getPermissionById(props.id)
+		withServerAction(getPermissionByIdAction, props.id)
 			.then((response) => {
 				if (response.success) {
 					const data = response.data;
@@ -95,7 +95,7 @@ export default function FormModal(props: ModalProps) {
 
 	const handleSubmit = (values: PermissionFormData) => {
 		setSubmitting(true);
-		withServerAction(upsertPermission, values)
+		withServerAction(upsertPermissionAction, values)
 			.then((response) => {
 				showNotification(response.message!, "success");
 				closeModal();
