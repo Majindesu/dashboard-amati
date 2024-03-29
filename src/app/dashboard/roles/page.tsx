@@ -1,6 +1,6 @@
 import checkMultiplePermissions from "@/modules/auth/utils/checkMultiplePermissions";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
-import getAllRoles from "@/modules/role/actions/getAllRoles";
+import getAllRoles from "@/modules/role/services/getAllRoles";
 import RolesTable from "@/modules/role/tables/RolesTable/RolesTable";
 import { Card, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
@@ -21,14 +21,13 @@ export default async function RolesPage() {
 
 	if (!permissions.readAll) unauthorized()
 
-	const res = await getAllRoles();
-	if (!res.success) throw new Error("Error while fetch roles");
+	const roles = await getAllRoles();
 
 	return (
 		<Stack>
 			<Title order={1}>Roles</Title>
 			<Card>
-				<RolesTable permissions={permissions} roles={res.data} />
+				<RolesTable permissions={permissions} data={roles} />
 			</Card>
 		</Stack>
 	);

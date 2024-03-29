@@ -12,7 +12,7 @@ import Role from "../../types/Role";
 
 interface Props {
 	permissions: Partial<CrudPermissions>;
-	roles: Role[];
+	data: Role[];
 }
 
 export default function RolesTable(props: Props) {
@@ -28,7 +28,7 @@ export default function RolesTable(props: Props) {
 	});
 
 	const table = useReactTable({
-		data: props.roles,
+		data: props.data,
 		columns: createColumns({
 			permissions: props.permissions,
 			actions: {

@@ -21,8 +21,8 @@ import { TbDeviceFloppy } from "react-icons/tb";
 import roleFormDataSchema, { RoleFormData } from "../formSchemas/RoleFormData";
 import getAllPermissions from "@/modules/permission/actions/getAllPermissions";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
-import getRoleById from "../actions/getRoleById";
-import upsertRole from "../actions/upsertRole";
+import getRoleByIdAction from "../actions/getRoleByIdAction";
+import upsertRoleAction from "../actions/upsertRoleAction";
 import ClientError from "@/core/error/ClientError";
 
 export interface ModalProps {
@@ -96,7 +96,7 @@ export default function FormModal(props: ModalProps) {
 		}
 
 		setFetching(true);
-		withServerAction(getRoleById, props.id)
+		withServerAction(getRoleByIdAction, props.id)
 			.then((response) => {
 				const data = response.data;
 				form.setValues({
@@ -133,7 +133,7 @@ export default function FormModal(props: ModalProps) {
 
 	const handleSubmit = (values: RoleFormData) => {
 		setSubmitting(true);
-		withServerAction(upsertRole, values)
+		withServerAction(upsertRoleAction, values)
 			.then((response) => {
 				showNotification(response.message!, "success");
 				closeModal();

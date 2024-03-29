@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { showNotification } from "@/utils/notifications";
 import withServerAction from "@/modules/dashboard/utils/withServerAction";
-import deleteRole from "../actions/deleteRole";
+import deleteRoleAction from "../actions/deleteRoleAction";
 import ClientError from "@/core/error/ClientError";
 
 export interface DeleteModalProps {
@@ -38,7 +38,7 @@ export default function DeleteModal(props: DeleteModalProps) {
 		if (!props.data?.id) return;
 		setSubmitting(true);
 
-		withServerAction(deleteRole, props.data!.id)
+		withServerAction(deleteRoleAction, props.data!.id)
 			.then((response) => {
 				showNotification(
 					response.message ?? "Role deleted successfully"

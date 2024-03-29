@@ -1,22 +1,19 @@
 "use server";
 
-import db from "@/core/db";
-import prisma from "@/db";
-import checkPermission from "@/modules/dashboard/services/checkPermission";
+import checkPermission from "@/modules/auth/utils/checkPermission";
 import ServerResponseAction from "@/modules/dashboard/types/ServerResponseAction";
 import handleCatch from "@/modules/dashboard/utils/handleCatch";
 import unauthorized from "@/modules/dashboard/utils/unauthorized";
 import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
+import deleteRole from "../services/deleteRole";
 
-export default async function deleteRole(
+export default async function deleteRoleAction(
 	id: string
 ): Promise<ServerResponseAction> {
 	try {
 		if (!(await checkPermission("roles.delete"))) return unauthorized();
-		const role = await db.role.delete({
-			where: { id },
-		});
+
+		await deleteRole(id);
 
 		revalidatePath(".");
 
