@@ -95,15 +95,24 @@ const permissionData = [
 		isActive: true,
 	},
 
-    //Promos
-    {
-        code: "promos.readAll",
-        name: "Read all promos",
-    } 
+	//Promos
+	{
+		code: "promos.readAll",
+		name: "Read all promos",
+	},
 ] as const;
 
-export type PermissionCode = (typeof permissionData)[number]['code'] | "*" | "authenticated-only" | "guest-only";
+export type SpecificPermissionCode = (typeof permissionData)[number]["code"];
 
-const exportedPermissionData = permissionData as unknown as Omit<Permission, "id">[];
+export type PermissionCode =
+	| SpecificPermissionCode
+	| "*"
+	| "authenticated-only"
+	| "guest-only";
 
-export default exportedPermissionData
+const exportedPermissionData = permissionData as unknown as Omit<
+	Permission,
+	"id"
+>[];
+
+export default exportedPermissionData;

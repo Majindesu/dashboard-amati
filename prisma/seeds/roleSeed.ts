@@ -1,18 +1,9 @@
-import { Role, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { log } from "console";
+import roleData from "../../src/modules/role/data/initialRoles";
 
 export default async function roleSeed(prisma: PrismaClient) {
 	log("Seeding roles...");
-
-	const roleData: Omit<Role, "id">[] = [
-		{
-			code: "super-admin",
-			description:
-				"Has full access to the system and can manage all features and settings",
-			isActive: true,
-			name: "Super Admin",
-		},
-	];
 
 	await Promise.all(
 		roleData.map(async (role) => {
@@ -20,8 +11,28 @@ export default async function roleSeed(prisma: PrismaClient) {
 				where: {
 					code: role.code,
 				},
-				update: role,
-				create: role,
+				update: {
+					code: role.code,
+					description: role.description,
+					isActive: role.isActive,
+					name: role.name,
+					permissions: {
+						connect: role.permissions.map((permissionCode) => ({
+							code: permissionCode,
+						})),
+					},
+				},
+				create: {
+					code: role.code,
+					description: role.description,
+					isActive: role.isActive,
+					name: role.name,
+					permissions: {
+						connect: role.permissions.map((permissionCode) => ({
+							code: permissionCode,
+						})),
+					},
+				},
 			});
 		})
 	);
